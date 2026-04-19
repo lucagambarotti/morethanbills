@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>More Than Bills — Simulatore Bolletta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #F4F5F0;
+  --white:     #FFFFFF;
+  --ink:       #1C2B20;
+  --ink2:      #374140;
+  --muted:     #6B7570;
+  --light:     #9CAD9C;
+  --hairline:  #DDE3DD;
+  --rule:      #C8D1C8;
+  --yellow:    #E8C200;
+  --yellow-dk: #C9A800;
+  --yellow-bg: #FFFBE6;
+  --yellow-bd: #F0D840;
+  --green:     #2D7A4F;
+  --green-dk:  #1F5C3A;
+  --green-lt:  #EBF5EE;
+  --green-md:  #A8D4B5;
+  --green-bd:  #5CAF7C;
+  --sage:      #6B9E78;
+  --max:       700px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+header{background:var(--white);border-bottom:1px solid var(--rule);height:54px;padding:0 20px;display:flex;align-items:center}
+.h-inner{max-width:var(--max);width:100%;margin:0 auto;display:flex;align-items:center;gap:12px}
+.bolt{width:28px;height:28px;border-radius:7px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand{font-size:.95rem;font-weight:800;letter-spacing:-.3px;color:var(--ink)}
+.hdiv{width:1px;height:18px;background:var(--rule);margin:0 2px}
+.hsub{font-size:.78rem;color:var(--muted);font-weight:500}
+@media(max-width:480px){.hdiv,.hsub{display:none}}
+
+/* MAIN */
+main{max-width:var(--max);margin:0 auto;padding:18px 20px 80px}
+.page-title{font-size:1.7rem;font-weight:800;letter-spacing:-.6px;margin-bottom:5px;color:var(--ink)}
+.page-sub{font-size:.88rem;color:var(--muted);margin-bottom:28px}
+
+/* FORM */
+.form-card{background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:22px;margin-bottom:14px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+@media(max-width:420px){.fgrid{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+select,input[type=number]{width:100%;padding:9px 12px;border:1.5px solid var(--rule);border-radius:8px;background:var(--white);color:var(--ink);font-family:'Figtree',sans-serif;font-size:.93rem;font-weight:500;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+select:focus,input[type=number]:focus{outline:none;border-color:var(--green-bd);box-shadow:0 0 0 3px rgba(45,122,79,.1)}
+.kwh-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.fg-hint{font-size:.72rem;color:var(--light);margin-top:4px;line-height:1.45}
+.fdiv{border:none;border-top:1px solid var(--hairline);margin:16px 0}
+
+.btn-calc{width:100%;padding:13px 18px;background:var(--yellow);border:none;border-radius:8px;font-family:'Figtree',sans-serif;font-size:.95rem;font-weight:800;color:var(--ink);cursor:pointer;text-transform:uppercase;transition:background .12s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-calc:hover{background:var(--yellow-dk);box-shadow:0 3px 12px rgba(232,194,0,.35)}
+
+.err-bar{background:#FEF2F2;border:1px solid #FECACA;border-left:3px solid #DC2626;border-radius:6px;padding:10px 14px;color:#991B1B;font-size:.85rem;font-weight:500;margin-bottom:14px;display:none}
+.err-bar.vis{display:block}
+
+/* RESULT */
+#result-wrap{display:none}
+#result-wrap.vis{display:block;animation:fu .3s ease}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* RESULT HEADER */
+.res-header{background:var(--yellow-bg);border:1.5px solid var(--yellow-bd);border-radius:10px;padding:20px 22px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.rh-meta{display:flex;flex-direction:column;gap:5px}
+.rh-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.45px;color:var(--muted)}
+.rh-tag span{color:var(--ink2)}
+.rh-title{font-size:.9rem;font-weight:500;color:var(--ink2)}
+.rh-amount{text-align:right;flex-shrink:0}
+.rh-alabel{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+.rh-aval{font-size:2.4rem;font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--ink)}
+.rh-icon{width:34px;height:34px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-start}
+
+/* BLOCKS */
+.rblock{background:var(--white);border:1px solid var(--rule);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.rblock-head{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--hairline);background:var(--bg)}
+.rblock-head-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+
+/* TABLE ROWS */
+.trow{display:flex;justify-content:space-between;align-items:baseline;padding:11px 18px;border-bottom:1px solid var(--hairline);gap:12px}
+.trow:last-child{border-bottom:none}
+.trow.sub{padding:5px 18px 8px 32px;background:var(--bg)}
+.trow.dimmed{opacity:.5}
+.trow .t-name{font-size:.9rem;color:var(--ink2)}
+.trow.sub .t-name{font-size:.79rem;color:var(--muted)}
+.trow .t-val{font-size:.9rem;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+.trow.sub .t-val{font-size:.79rem;font-weight:600;color:var(--ink2)}
+.trow.bonus .t-name{font-size:.79rem;color:#2D7A4F;font-weight:600}
+.trow.bonus .t-val{font-size:.79rem;font-weight:700;color:#2D7A4F}
+.trow.total{background:var(--green-lt);border-top:1px solid var(--green-md);border-bottom:none;padding:13px 18px}
+.trow.total .t-name{font-weight:700;color:var(--ink);font-size:.93rem}
+.trow.total .t-val{font-size:1.2rem;font-weight:800;color:var(--green);letter-spacing:-.3px}
+.info-strip{display:flex;align-items:flex-start;gap:8px;padding:10px 18px;background:var(--yellow-bg);border-top:1px solid var(--yellow-bd);font-size:.79rem;color:#7A6000;font-weight:500;line-height:1.45}
+
+/* SEGNALAZIONI */
+.segn-kpi{padding:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--hairline);flex-wrap:wrap;background:var(--green-lt)}
+.kpi-left{display:flex;flex-direction:column;gap:2px}
+.kpi-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--sage)}
+.kpi-val{display:flex;align-items:flex-end;gap:7px}
+.kpi-num{font-size:3rem;font-weight:800;letter-spacing:-2px;color:var(--green);line-height:1}
+.kpi-unit{font-size:.9rem;font-weight:600;color:var(--sage);padding-bottom:5px}
+.kpi-tags{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.ktag{font-size:.71rem;font-weight:700;padding:3px 9px;border-radius:6px;letter-spacing:.2px;white-space:nowrap}
+.ktag-yellow{background:var(--yellow-bg);color:#7A6000;border:1px solid var(--yellow-bd)}
+.ktag-green{background:var(--green-lt);color:var(--green);border:1px solid var(--green-md)}
+.segn-intro-strip{padding:12px 18px;font-size:.83rem;color:var(--ink2);border-bottom:1px solid var(--hairline);line-height:1.55;background:var(--white)}
+
+/* SCENARIOS TABLE */
+.scen-row-head{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:8px 18px;background:var(--bg);border-bottom:1px solid var(--hairline);gap:8px}
+.scen-row-head span{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--light)}
+.scen-row-head span:not(:first-child){text-align:right}
+.scen-data-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:11px 18px;border-bottom:1px solid var(--hairline);gap:8px;align-items:center;transition:background .1s}
+.scen-data-row:hover{background:var(--green-lt)}
+.scen-data-row:last-of-type{border-bottom:none}
+.s-label{font-size:.86rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+.s-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;background:var(--green-lt);color:var(--green);font-size:.7rem;font-weight:800;flex-shrink:0;border:1px solid var(--green-md)}
+.s-val{font-size:.86rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+@media(max-width:440px){.scen-row-head,.scen-data-row{grid-template-columns:1.4fr 1fr 1fr}.scen-row-head span:last-child,.scen-data-row .s-val:nth-child(4){display:none}}
+
+/* ACCORDION */
+.acc-trigger{width:100%;background:var(--bg);border:none;border-top:1px solid var(--hairline);padding:10px 18px;text-align:left;font-family:'Figtree',sans-serif;font-size:.79rem;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .12s}
+.acc-trigger:hover{color:var(--ink)}
+.chev{font-size:.65rem;transition:transform .2s;display:inline-block}
+.chev.open{transform:rotate(180deg)}
+.acc-panel{display:none}
+.acc-panel.open{display:block}
+.acc-panel pre{font-family:'Figtree',sans-serif;font-size:.75rem;color:var(--muted);white-space:pre-wrap;line-height:1.75;padding:14px 18px;border-top:1px solid var(--hairline);background:#FAFAF8}
+
+/* ===== BOLLETTA BUTTON ===== */
+.boll-btn-wrap{margin:16px 0 10px;position:relative}
+.boll-btn-wrap::before{content:'';display:block;border-top:2px dashed var(--green-md);margin-bottom:14px}
+.btn-bolletta{width:100%;padding:14px 20px;background:var(--green);border:none;border-radius:10px;font-family:'Figtree',sans-serif;font-size:.93rem;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 2px 10px rgba(45,122,79,.2);transition:background .12s,box-shadow .15s,transform .1s}
+.btn-bolletta:hover{background:var(--green-dk);box-shadow:0 5px 18px rgba(45,122,79,.32);transform:translateY(-1px)}
+.btn-bolletta:active{transform:translateY(0)}
+.btn-bolletta.outline{background:var(--white);color:var(--green);border:2px solid var(--green-bd);box-shadow:0 1px 6px rgba(45,122,79,.1)}
+.btn-bolletta.outline:hover{background:var(--green-lt);box-shadow:0 4px 14px rgba(45,122,79,.18);transform:translateY(-1px)}
+
+/* ===== PLAY SEGNALAZIONI ===== */
+.play-intro{padding:14px 18px;font-size:.86rem;color:var(--ink2);line-height:1.6;border-bottom:1px solid var(--hairline);background:var(--white)}
+.play-intro strong{color:var(--green)}
+.play-ctrl{padding:14px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--hairline);background:var(--bg);flex-wrap:wrap}
+.play-ctrl label{font-size:.79rem;font-weight:700;color:var(--ink2);flex-shrink:0}
+.play-ctrl input[type=number]{width:80px;padding:8px 10px;text-align:center;font-weight:800;font-size:1.05rem;border:2px solid var(--green-bd);border-radius:8px}
+.play-ctrl .play-hint{font-size:.73rem;color:var(--sage);line-height:1.4}
+.play-results{padding:0}
+.play-tot-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 18px;border-bottom:1px solid var(--hairline);gap:12px}
+.play-tot-row .pt-label{font-size:.86rem;color:var(--ink2)}
+.play-tot-row .pt-val{font-size:.95rem;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.play-tot-row.highlight{background:var(--green-lt)}
+.play-tot-row.highlight .pt-label{font-weight:700;color:var(--green-dk)}
+.play-tot-row.highlight .pt-val{color:var(--green)}
+.saving-badge{margin:12px 18px 0;padding:10px 14px;background:var(--green-lt);border:1px solid var(--green-md);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:.82rem}
+.saving-badge .sb-icon{font-size:1.1rem;flex-shrink:0}
+.saving-badge .sb-text{color:var(--green-dk);line-height:1.4}
+.saving-badge .sb-text strong{display:block;font-size:.98rem;font-weight:800;color:var(--green)}
+.play-boll-wrap{padding:14px 18px 18px}
+
+/* ===== EXTRA UTENZE ===== */
+.ext-ctrl-strip{padding:12px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--hairline);background:var(--bg);flex-wrap:wrap}
+.ext-ctrl-strip label{font-size:.79rem;font-weight:600;color:var(--ink2);flex-shrink:0}
+.ext-ctrl-strip select{width:68px;padding:6px 8px;font-size:.84rem}
+.ext-body{padding:16px 18px}
+.ext-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media(max-width:420px){.ext-fields-grid{grid-template-columns:1fr}}
+.ext-fields-grid .fg{gap:4px}
+.btn-recalc{padding:9px 16px;background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:7px;font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:700;color:var(--green-dk);cursor:pointer;transition:background .12s;display:none;margin-bottom:12px}
+.btn-recalc:hover{background:var(--green-md)}
+#res-ext{border:2px solid var(--yellow-bd);background:var(--yellow-bg)}
+#res-ext .rblock-head{background:var(--yellow-bg);border-bottom-color:var(--yellow-bd)}
+#res-ext .rblock-head-title{color:#7A6000}
+.ext-promo-head{padding:16px 18px 0;display:flex;align-items:flex-start;gap:14px}
+.ext-promo-icon{width:40px;height:40px;border-radius:9px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ext-promo-text h3{font-size:1rem;font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-bottom:3px}
+.ext-promo-text p{font-size:.84rem;color:var(--ink2);line-height:1.5}
+.ext-res-section{border-top:1px solid var(--yellow-bd);padding:14px 18px 0}
+
+/* ============================================================
+   BOLLETTA MODAL
+   ============================================================ */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,22,.65);backdrop-filter:blur(3px);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:#fff;width:100%;max-width:820px;border-radius:12px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35);margin:auto}
+.modal-top-bar{background:var(--green);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.modal-top-title{font-size:.85rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden}
+.modal-top-title span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-top-actions{display:flex;gap:8px;flex-shrink:0}
+.btn-modal-print{padding:7px 14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:6px;color:#fff;font-family:'Figtree',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .12s}
+.btn-modal-print:hover{background:rgba(255,255,255,.28)}
+@media(max-width:480px){.btn-modal-print span{display:none}}
+.btn-modal-close{width:32px;height:32px;border-radius:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Figtree',sans-serif;flex-shrink:0}
+.btn-modal-close:hover{background:rgba(255,255,255,.3)}
+
+/* BOLLETTA BODY — mobile scroll */
+.boll-body{overflow-x:auto}
+.boll-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.boll-quadro-header{background:#F0B800;padding:10px 14px;border-bottom:2px solid #C9900A}
+.boll-quadro-title{font-size:.88rem;font-weight:800;color:#1a1a00}
+.boll-section-title{background:#F0B800;padding:6px 14px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#1a1a00;border-top:1px solid #c9900a;border-bottom:1px solid #c9900a}
+.boll-subsection-title{background:#1C2B20;padding:5px 14px;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#fff}
+.boll-table{width:100%;border-collapse:collapse;font-size:.72rem;min-width:520px}
+.boll-table thead tr{background:#f0ede0}
+.boll-table thead th{padding:5px 8px;text-align:right;font-weight:700;font-size:.63rem;text-transform:uppercase;letter-spacing:.3px;color:#555;border-bottom:1.5px solid #ddd;white-space:nowrap}
+.boll-table thead th:first-child{text-align:left;min-width:160px}
+.boll-table thead th.ctr{text-align:center}
+.boll-table tbody tr{border-bottom:1px solid #eee}
+.boll-table tbody tr:hover{background:#fffdf0}
+.boll-table tbody td{padding:5px 8px;vertical-align:middle;color:#222}
+.boll-table tbody td:not(:first-child){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.boll-table tbody td.td-iva{text-align:center;color:#888}
+.boll-table tfoot tr{background:#EBF5EE}
+.boll-table tfoot td{padding:6px 8px;font-weight:800;font-size:.78rem;color:#1F5C3A}
+.boll-table tfoot td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.boll-neg{color:#c0392b!important;font-weight:700}
+.boll-totdoc{background:#f9f9f5;padding:14px 16px;border-top:2px solid #F0B800}
+.boll-totdoc-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:8px}
+.boll-totdoc-grid{display:flex;flex-direction:column;gap:0;max-width:320px;margin-left:auto}
+.boll-totline{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e8e5d8}
+.boll-totline:last-child{border-bottom:none}
+.boll-totline .tl-label{font-size:.78rem;color:#444;font-weight:500}
+.boll-totline .tl-val{font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums;color:#1a1a00}
+.boll-totline.big .tl-label{font-size:.88rem;font-weight:800;color:#1a1a00}
+.boll-totline.big .tl-val{font-size:1.1rem;font-weight:800}
+.boll-totline.fornitura{background:#F0B800;margin:6px 0 0;padding:8px 10px;border-radius:4px;border-bottom:none}
+.boll-totline.fornitura .tl-label{font-size:.88rem;font-weight:800;color:#1a1a00}
+.boll-totline.fornitura .tl-val{font-size:1.1rem;font-weight:800;color:#1a1a00}
+.boll-note{padding:10px 14px;font-size:.66rem;color:#888;border-top:1px solid #eee;line-height:1.6;background:#fafafa}
+
+.tipo-toggle{display:flex;gap:0;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--white)}
+.tipo-toggle label{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;transition:background .12s,color .12s;user-select:none}
+.tipo-toggle input[type=radio]{display:none}
+.tipo-toggle input[type=radio]:checked + span{color:var(--ink)}
+.tipo-toggle label:has(input:checked){background:var(--green-lt);color:var(--green-dk);border-color:transparent}
+.tipo-toggle label:first-child{border-right:1.5px solid var(--rule)}
+.pun-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:5px;margin-top:4px;background:var(--yellow-bg);color:#7A6000;border:1px solid var(--yellow-bd)}
+.pun-badge.ok{background:var(--green-lt);color:var(--green-dk);border-color:var(--green-md)}
+.pun-badge.err{background:#FEF2F2;color:#991B1B;border-color:#FECACA}
+.fetch-strip{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:8px;margin-top:10px;flex-wrap:wrap}
+.fetch-strip label{font-size:.75rem;font-weight:700;color:var(--green-dk);flex-shrink:0}
+.fetch-strip input[type=password]{flex:1;min-width:180px;padding:7px 10px;font-size:.82rem;border:1.5px solid var(--green-bd);border-radius:6px;font-family:'Figtree',sans-serif}
+.btn-fetch{padding:7px 14px;background:var(--green);border:none;border-radius:6px;color:#fff;font-family:'Figtree',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .12s}
+.btn-fetch:hover{background:var(--green-dk)}
+.btn-fetch:disabled{opacity:.5;cursor:not-allowed}
+.fetch-status{font-size:.75rem;color:var(--sage);width:100%;line-height:1.4}
+/* ---- MOBILE BOLLETTA ---- */
+@media(max-width:600px){
+  .modal-overlay{padding:0}
+  .modal-sheet{border-radius:0;min-height:100dvh}
+  .boll-table-wrap{overflow-x:hidden}
+  .boll-table{display:block;min-width:0}
+  .boll-table thead{display:none}
+  .boll-table tbody{display:block}
+  .boll-table tfoot{display:block}
+  .boll-table tbody tr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 14px;border-bottom:1px solid #eee}
+  .boll-table tbody td{display:none}
+  .boll-table tbody td:first-child{display:block;flex:1;font-size:.78rem;color:#222;line-height:1.4}
+  .boll-table tbody td:nth-child(5){display:block;font-size:.78rem;font-weight:700;white-space:nowrap;text-align:right;flex-shrink:0}
+  .boll-table tfoot tr{display:flex;justify-content:space-between;align-items:center;padding:7px 14px}
+  .boll-table tfoot td{display:none}
+  .boll-table tfoot td:first-child{display:block;font-weight:800;font-size:.82rem;color:#1F5C3A}
+  .boll-table tfoot td:nth-child(5){display:block;font-weight:800;font-size:.82rem;color:#1F5C3A;text-align:right}
+  .boll-totdoc-grid{max-width:100%}
+  .boll-quadro-title{font-size:.82rem}
+  .boll-section-title{padding:6px 12px;font-size:.65rem}
+  .boll-totdoc{padding:12px 14px}
+  .boll-note{padding:8px 12px;font-size:.65rem}
+}
+/* ---- CONFRONTO TARIFFE ---- */
+.tariffa-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 18px}
+@media(max-width:440px){.tariffa-cards{grid-template-columns:1fr}}
+.tariffa-card{border:1.5px solid var(--rule);border-radius:9px;padding:14px;position:relative;background:var(--white);transition:border-color .15s}
+.tariffa-card.winner{border-color:var(--green-bd);background:var(--green-lt)}
+.tariffa-card.variabile-warn{border-color:var(--yellow-bd);background:var(--yellow-bg)}
+.tc-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.65rem;font-weight:800;padding:2px 10px;border-radius:20px;letter-spacing:.3px}
+.tc-badge.green{background:var(--green);color:#fff}
+.tc-badge.yellow{background:var(--yellow);color:var(--ink)}
+.tc-badge.muted{background:var(--muted);color:#fff}
+.tc-title{font-size:.78rem;font-weight:800;color:var(--ink2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.tc-price{font-size:1.6rem;font-weight:800;letter-spacing:-1px;color:var(--ink);line-height:1.1;margin:6px 0}
+.tc-price.green{color:var(--green)}
+.tc-sub{font-size:.72rem;color:var(--muted);line-height:1.5}
+.tc-prezzo{font-size:.75rem;font-weight:600;color:var(--sage);margin-top:6px;padding-top:6px;border-top:1px solid var(--hairline)}
+.tariffa-reco{margin:0 18px 16px;padding:12px 14px;background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:8px;font-size:.82rem;color:var(--green-dk);font-weight:600;line-height:1.5}
+.tariffa-warn{margin:0 18px 16px;padding:12px 14px;background:var(--yellow-bg);border:1.5px solid var(--yellow-bd);border-radius:8px;font-size:.82rem;color:#7A6000;font-weight:600;line-height:1.5}
+
+/* ---- SCONTRINO ENERGIA ---- */
+.scontrino-wrap{background:#fffef5;border-bottom:2px solid #F0B800;padding:0 0 2px}
+.scontrino-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;padding:10px 16px 4px;border-top:1px solid #eee}
+.scontrino-table{width:100%;border-collapse:collapse;font-size:.72rem}
+.scontrino-table thead tr{background:#f0ede0}
+.scontrino-table thead th{padding:5px 10px;text-align:left;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#555;border-bottom:1.5px solid #ddd}
+.scontrino-table thead th:last-child{text-align:right}
+.sc-section-head td{padding:4px 10px 2px;font-size:.67rem;font-weight:700;color:#7A6000;background:#fffbee;border-top:1px solid #ede8c5;text-transform:uppercase;letter-spacing:.3px}
+.sc-main td{padding:5px 10px 2px;color:#222;font-weight:600}
+.sc-sub td{padding:1px 10px 3px;color:#555;font-size:.7rem;border-bottom:1px solid #f2f0e8}
+.sc-pm{color:#666;font-style:italic}
+.sc-imp{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sc-imp span{font-style:normal;color:#333}
+.sc-divider td{padding:0;border-top:1.5px solid #ddd;background:#f5f3ea}
+.sc-totline td{padding:4px 10px;border-bottom:1px solid #eee;color:#444}
+.sc-totline .sc-imp{text-align:right;font-variant-numeric:tabular-nums}
+.sc-bold td{font-weight:800;color:#1a1a00;font-size:.78rem}
+.sc-forn{background:#F0B800}
+.sc-forn td{color:#1a1a00;font-size:.84rem}
+@media(max-width:600px){
+  .scontrino-table{font-size:.7rem}
+  .sc-sub{display:none}
+  .sc-imp span{display:block;font-size:.68rem}
+}
+
+@media print{
+  body *{visibility:hidden}
+  .modal-overlay,.modal-overlay *{visibility:visible}
+  .modal-overlay{position:absolute;top:0;left:0;padding:0;background:none;backdrop-filter:none;display:block!important}
+  .modal-sheet{box-shadow:none;border-radius:0;max-width:100%}
+  .modal-top-bar,.btn-bolletta{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-inner">
+    <div class="bolt">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg>
+    </div>
+    <span class="brand">More Than Bills</span>
+    <div class="hdiv"></div>
+    <span class="hsub">Simulatore Bolletta Domestica</span>
+    <div style="margin-left:auto">
+      <a href="scan.html" style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--yellow);border-radius:6px;font-size:.78rem;font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Hai la bolletta?
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div style="height:16px"></div>
+  <div class="page-title">Simulatore Bolletta Domestica</div>
+  <div class="page-sub">Inserisci i dati dalla tua bolletta per ottenere il totale dettagliato e la simulazione vantaggi.</div>
+
+  <div class="form-card">
+    <div class="fgrid">
+    <div class="fg full" style="margin-bottom:4px">
+        <label>Tipo bolletta</label>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div class="tipo-toggle" style="max-width:280px">
+            <label><input type="radio" name="tipo" value="mensile" checked onchange="toggleTipo()"><span>📅 Mensile</span></label>
+            <label><input type="radio" name="tipo" value="bimestrale" onchange="toggleTipo()"><span>📅📅 Bimestrale</span></label>
+          </div>
+          <div id="wrap-mese" style="flex:1;min-width:160px">
+            <select id="mese" style="width:100%">
+              <option value="Ottobre 2025">Ottobre 2025</option>
+              <option value="Novembre 2025">Novembre 2025</option>
+              <option value="Dicembre 2025">Dicembre 2025</option>
+              <option value="Gennaio 2026">Gennaio 2026</option>
+              <option value="Febbraio 2026">Febbraio 2026</option>
+              <option value="Marzo 2026" selected>Marzo 2026</option>
+              <option value="Aprile 2026">Aprile 2026</option>
+            </select>
+            <div id="pun-badge-mese" class="pun-badge" style="display:none"></div>
+          </div>
+          <div id="wrap-bimestre" style="flex:1;min-width:160px;display:none">
+            <select id="bimestre" style="width:100%">
+              <option value="Ott – Nov 2025">Ott – Nov 2025</option>
+              <option value="Nov – Dic 2025">Nov – Dic 2025</option>
+              <option value="Dic 25 – Gen 26">Dic 25 – Gen 26</option>
+              <option value="Gen – Feb 2026">Gen – Feb 2026</option>
+              <option value="Feb – Mar 2026">Feb – Mar 2026</option>
+              <option value="Mar – Apr 2026" selected>Mar – Apr 2026</option>
+            </select>
+            <div id="pun-badge-bim" class="pun-badge" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Profilo</label>
+        <select id="profilo">
+          <option value="residente">Domestico residente</option>
+          <option value="nonResidente">Domestico non residente</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Tipo tariffa</label>
+        <select id="tariffa-tipo" onchange="onTariffaTipoChange()">
+          <option value="variabile">⚡ Variabile (PUN + spread)</option>
+          <option value="fissa">🔒 Fissa</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Potenza contrattuale (kW)</label>
+        <input type="number" id="kw" min="0.1" step="0.5" value="3">
+      </div>
+      <div class="fg full">
+        <label id="kwh-label">Consumi del mese per fascia (kWh)</label>
+        <div class="kwh-grid">
+          <div class="fg"><label>F1</label><input type="number" id="f1" min="0" step="1" value="100"></div>
+          <div class="fg"><label>F2</label><input type="number" id="f2" min="0" step="1" value="80"></div>
+          <div class="fg"><label>F3</label><input type="number" id="f3" min="0" step="1" value="70"></div>
+        </div>
+        <p class="fg-hint" id="kwh-hint">Per la lettura su 12 mesi il simulatore usa automaticamente il consumo del mese × 12.</p>
+      </div>
+    </div>
+    <div class="fetch-strip" id="fetch-strip" style="display:none">
+      <label>🔄 Aggiorna PUN automaticamente:</label>
+      <input type="password" id="api-key" placeholder="Chiave API Anthropic (sk-ant-…)" autocomplete="off">
+      <button class="btn-fetch" id="btn-fetch" onclick="fetchPUN()">Aggiorna PUN</button>
+      <div class="fetch-status" id="fetch-status">Inserisci la tua API key per recuperare il PUN aggiornato da GME in tempo reale. * = stima, → = da aggiornare</div>
+    </div>
+    <hr class="fdiv">
+    <button class="btn-calc" onclick="calcola()">&#9638; &nbsp;Calcola bolletta</button>
+  </div>
+
+  <div class="err-bar" id="err-bar"></div>
+
+  <div id="result-wrap">
+    <!-- 1. HEADER + STRIP INFO + DETTAGLIO + TOTALI -->
+    <div class="res-header" id="res-header"></div>
+    <div id="res-strip"></div>
+    <div class="rblock" id="res-breakdown"></div>
+    <div class="rblock" id="res-totali"></div>
+
+    <!-- 2. CONFRONTO TARIFFA (solo per tariffa fissa) -->
+    <div id="res-tariffa" style="display:none"></div>
+
+    <!-- 3. PULSANTI BOLLETTA + SCONTRINO -->
+    <div class="boll-btn-wrap">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-bolletta" style="flex:1;min-width:140px" onclick="openBolletta(0,0,'')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
+          Anteprima bolletta
+        </button>
+        <button class="btn-bolletta" style="flex:1;min-width:140px;background:var(--yellow);color:var(--ink)" onclick="openScontrino()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Scontrino dell'energia
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. SEGNALAZIONI PER AZZERARE SPREAD -->
+    <div class="rblock" id="res-segn"></div>
+
+    <!-- 4. GIOCA CON LE SEGNALAZIONI (250 kWh medio) -->
+    <div class="rblock" id="res-segn-play"></div>
+
+    <!-- 5. ALTRE UTENZE A TUO NOME -->
+    <div class="rblock" id="res-ext"></div>
+
+    <!-- 6. DETTAGLIO MATERIA ENERGIA -->
+    <div class="rblock" id="res-det"></div>
+  </div>
+</main>
+
+<!-- MODAL BOLLETTA -->
+<div class="modal-overlay" id="modal-bolletta" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-top-bar">
+      <div class="modal-top-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
+        <span id="modal-title-text">Anteprima Bolletta</span>
+      </div>
+      <div class="modal-top-actions">
+        <button class="btn-modal-print" onclick="window.print()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Stampa</span>
+        </button>
+        <button class="btn-modal-close" onclick="closeBolletta()">✕</button>
+      </div>
+    </div>
+    <div id="boll-body"></div>
+  </div>
+</div>
+
+<!-- MODAL SCONTRINO -->
+<div class="modal-overlay" id="modal-scontrino" onclick="if(event.target===this)closeScontrino()">
+  <div class="modal-sheet">
+    <div class="modal-top-bar" style="background:#7A6000">
+      <div class="modal-top-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <span>Scontrino dell'Energia</span>
+      </div>
+      <div class="modal-top-actions">
+        <button class="btn-modal-close" onclick="closeScontrino()">✕</button>
+      </div>
+    </div>
+    <div id="scontrino-body"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================  TARIFFE  */
+// Tariffe ARERA trimestrali
+const Q4 = { dispFisso:0.007, commFisso:11.61, dispbt:0.102592, dispVar:0.037689, traspFisso:1.90, traspPot:2.106567, traspVar:0.01352, asos:0.029677, arim:0.001645, asosFisso:7.396 };
+const Q1 = { dispFisso:0.007, commFisso:11.61, dispbt:0.102592, dispVar:0.021242, traspFisso:1.92, traspPot:1.976567, traspVar:0.01473, asos:0.028657, arim:0.001638, asosFisso:7.396 };
+
+// PUN mensili (€/MWh) — valori confermati da CTE o stimati*
+const T = {
+  "Ottobre 2025":  { pun:111.04, ...Q4 },
+  "Novembre 2025": { pun:117.09, ...Q4 },
+  "Dicembre 2025": { pun:115.49, ...Q4 },
+  "Gennaio 2026":  { pun:132.96, ...Q1 },
+  "Febbraio 2026": { pun:114.41, ...Q1 },
+  "Marzo 2026":    { pun:143.4,  ...Q1 },
+  "Aprile 2026":   { pun:124.76, ...Q1 }
+};
+
+// Periodi bimestrali — pun calcolato dinamicamente come media dei 2 mesi
+const TB = {
+  "Ott – Nov 2025":  { m1:"Ottobre 2025",  m2:"Novembre 2025", q:Q4, d1:"01/10/2025", d2:"30/11/2025" },
+  "Nov – Dic 2025":  { m1:"Novembre 2025", m2:"Dicembre 2025", q:Q4, d1:"01/11/2025", d2:"31/12/2025" },
+  "Dic 25 – Gen 26": { m1:"Dicembre 2025", m2:"Gennaio 2026",  q:Q1, d1:"01/12/2025", d2:"31/01/2026" },
+  "Gen – Feb 2026":  { m1:"Gennaio 2026",  m2:"Febbraio 2026", q:Q1, d1:"01/01/2026", d2:"28/02/2026" },
+  "Feb – Mar 2026":  { m1:"Febbraio 2026", m2:"Marzo 2026",    q:Q1, d1:"01/02/2026", d2:"31/03/2026" },
+  "Mar – Apr 2026":  { m1:"Marzo 2026",    m2:"Aprile 2026",   q:Q1, d1:"01/03/2026", d2:"30/04/2026" }
+};
+
+function getBimPun(key) {
+  const b = TB[key];
+  const p1 = T[b.m1]?.pun, p2 = T[b.m2]?.pun;
+  if(p1 != null && p2 != null) return (p1 + p2) / 2;
+  return p1 ?? p2 ?? null;
+}
+/* ============================================================  COSTANTI  */
+const C = { spread:0.034, perdite:0.1, accisa:0.0227, iva:10.0, pfAdj:-10.0, friendDisc:0.01 };
+// Tariffa fissa prezzi (perdite 10% già incluse nel prezzo)
+const FISSO = { mono:0.1991, f1:0.2112, f2:0.2013, f3:0.1936 };
+
+const r2 = v => Math.round(v*100)/100;
+const r6 = v => Math.round(v*1e6)/1e6;
+const mx = v => v < 0 ? 0 : v;
+
+function daysInMonth(l){const m={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};const p=l.toLowerCase().trim().split(/\s+/),mo=m[p[0]],yr=parseInt(p[1]);if(!mo||!yr)return 30;return new Date(yr,mo,0).getDate();}
+function prorat(mo,d){return Math.round(mo*12/365*d);}
+function taxableKwh(tot,kw,l){if(kw>3)return tot;const d=daysInMonth(l),t1=prorat(150,d),t2=prorat(kw<=1.5?150:220,d);return mx(tot-Math.min(tot,mx(t1-mx(tot-t2))));}
+function canoneTv(l){const m={gennaio:1,febbraio:2,marzo:3,aprile:4,maggio:5,giugno:6,luglio:7,agosto:8,settembre:9,ottobre:10,novembre:11,dicembre:12};return(m[l.toLowerCase().trim().split(/\s+/)[0]]||0)<=10?9:0;}
+
+/* ============================================================  CALCULATE FIXED  */
+function calculateFixed(mese, t, f1, f2, f3, kw, profilo, tipoFisso, periodoLabel, isBim, divisore) {
+  const tot = f1+f2+f3;
+  const kfv = tot*(1+C.perdite); // dispacciamento variabile si applica su kfv
+  // Prezzo fisso comprensivo di perdite → si applica solo ai kWh consumati
+  const mE_fixed = tipoFisso==='mono'
+    ? FISSO.mono * tot
+    : FISSO.f1*f1 + FISSO.f2*f2 + FISSO.f3*f3;
+  const mDF=t.dispFisso, mCF=t.commFisso, mPF=C.pfAdj, mDB=t.dispbt, mDV=t.dispVar*kfv;
+  const ME=mDF+mCF+mPF+mDB+mDV+mE_fixed;
+  const TR=t.traspFisso+t.traspPot*kw+t.traspVar*tot;
+  const asosFissoNR=(profilo!=="residente")?(t.asosFisso||0):0;
+  const ON=(t.asos+t.arim)*tot+asosFissoNR;
+  const txK=(profilo==="residente")?taxableKwh(tot,kw,mese):tot, IMP=C.accisa*txK;
+  const impon=ME+TR+ON+IMP, IVA=impon*(C.iva/100);
+  const can=(profilo==="residente")?canoneTv(mese):0, TOT=impon+IVA+can;
+  const cM=(profilo==="residente")?7.5:0;
+  const Q4r=r2(TOT+10), EQ12=r2((3*TOT + 9*Q4r)/12);
+  const sAM=C.friendDisc*250, sAA=sAM*12, bPM=10, bPA=30+sAA, bPMs=bPA/12, cA=tot*12;
+  const sX=cA>0?Math.max(0,Math.ceil(((0)*cA-30)/bPA)):0; // spread=0 per fissa
+  const sc=n=>({prime3:r2(TOT-n*(bPM+sAM)),quarta:r2(Q4r-n*sAM),media12:r2(EQ12-n*bPMs)});
+  return {tariffaTipo:tipoFisso, mese, periodoLabel:periodoLabel||mese, isBim:!!isBim, divisore:divisore||1,
+    profilo, kw, f1, f2, f3, totalKwh:tot,
+    materiaEnergia:r2(ME), corrispettivi:r2(mCF), bonusPF:r2(mPF),
+    trasporto:r2(TR), oneri:r2(ON), imposte:r2(IMP), iva:r2(IVA),
+    canone:r2(can), totale:r2(TOT), totaleDallaQuarta:Q4r, totaleEq12:EQ12,
+    spreadNominale:0, spreadEq12:0, consumoMensile:tot, consumoAnnuo:cA,
+    bonusBenvenutoTot:30, bonusBenvenutoMedio:2.5,
+    scontoAmicoMedioMese:sAM, scontoAmicoMedioAnno:sAA,
+    beneficioPerSegnPerAnno:bPA, beneficioPerSegnPerMese:bPMs, bonusMensileReferral:bPM,
+    segnalazioniPerZero:sX, s1:sc(1), s2:sc(2), sN:sc(sX),
+    spreadEquiv1:0, spreadEquiv2:0, spreadEquivN:0, ridBenvenuto:0,
+    // per bolletta preview
+    eu:mE_fixed/tot, pun1k:0, pun:0,
+    mDF, mCF, mPF, mDB, mDV:r2(mDV), mE:r2(mE_fixed), mP:0,
+    traspFisso:t.traspFisso, traspPot:t.traspPot, traspPotTot:r2(t.traspPot*kw),
+    traspVar:t.traspVar, traspVarTot:r2(t.traspVar*tot),
+    asos:t.asos, arim:t.arim, asosFisso:t.asosFisso||0, asosFissoNR:asosFissoNR, txKwh:txK, impon:r2(impon),
+    loss:0, kfv:r2(kfv), dispVar:t.dispVar,
+    // prezzi fissi per bolletta
+    prezzoMono:FISSO.mono, prezzoF1:FISSO.f1, prezzoF2:FISSO.f2, prezzoF3:FISSO.f3
+  };
+}
+
+function onTariffaTipoChange() {
+  const isFissa = document.getElementById('tariffa-tipo').value === 'fissa';
+  // Per la fissa il PUN badge non è rilevante, nascondiamo
+  const bm = document.getElementById('pun-badge-mese');
+  const bb = document.getElementById('pun-badge-bim');
+  if(bm) bm.style.display = isFissa ? 'none' : 'inline-flex';
+  if(bb) bb.style.display = isFissa ? 'none' : 'inline-flex';
+  if(lastResult) calcola();
+}
+
+/* ============================================================  CALCULATE  */
+function calculateWith(mese,t,f1,f2,f3,kw,profilo,periodoLabel,isBim,divisore){
+  if(!t)throw new Error("Tariffe non trovate per: "+mese);
+  if(kw<=0)throw new Error("kW deve essere > 0");
+  if(f1<0||f2<0||f3<0)throw new Error("kWh non può essere negativo");
+  const tot=f1+f2+f3,loss=tot*C.perdite,kfv=tot+loss,eu=(t.pun/1000)+C.spread,pun1k=t.pun/1000;
+  const mDF=t.dispFisso,mCF=t.commFisso,mPF=C.pfAdj,mDB=t.dispbt,mDV=t.dispVar*kfv,mE=eu*tot,mP=eu*loss;
+  const ME=mDF+mCF+mPF+mDB+mDV+mE+mP;
+  const TR=t.traspFisso+t.traspPot*kw+t.traspVar*tot;
+  const asosFissoNR=(profilo!=="residente")?(t.asosFisso||0):0;
+  const ON=(t.asos+t.arim)*tot+asosFissoNR;
+  const txK=(profilo==="residente")?taxableKwh(tot,kw,mese):tot,IMP=C.accisa*txK;
+  const impon=ME+TR+ON+IMP,IVA=impon*(C.iva/100);
+  const can=(profilo==="residente")?canoneTv(mese):0,TOT=impon+IVA+can;
+  const cM=(profilo==="residente")?7.5:0;
+  const Q4r=r2(TOT+10),EQ12=r2((3*TOT + 9*Q4r)/12);
+  const sAM=C.friendDisc*250,sAA=sAM*12,bPM=10,bPA=30+sAA,bPMs=bPA/12,cA=tot*12;
+  const sX=cA>0?Math.max(0,Math.ceil(((C.spread*cA)-30)/bPA)):0;
+  const sc=n=>({prime3:r2(TOT-n*(bPM+sAM)),quarta:r2(Q4r-n*sAM),media12:r2(EQ12-n*bPMs)});
+  return{mese,periodoLabel:periodoLabel||mese,isBim:!!isBim,divisore:divisore||1,profilo,kw,f1,f2,f3,totalKwh:tot,
+    materiaEnergia:r2(ME),corrispettivi:r2(mCF),bonusPF:r2(mPF),
+    trasporto:r2(TR),oneri:r2(ON),imposte:r2(IMP),iva:r2(IVA),
+    canone:r2(can),totale:r2(TOT),totaleDallaQuarta:Q4r,totaleEq12:EQ12,
+    spreadNominale:C.spread,spreadEq12:r6(C.spread-30/cA),
+    consumoMensile:tot,consumoAnnuo:cA,
+    bonusBenvenutoTot:30,bonusBenvenutoMedio:2.5,
+    scontoAmicoMedioMese:sAM,scontoAmicoMedioAnno:sAA,
+    beneficioPerSegnPerAnno:bPA,beneficioPerSegnPerMese:bPMs,bonusMensileReferral:bPM,
+    segnalazioniPerZero:sX,s1:sc(1),s2:sc(2),sN:sc(sX),
+    spreadEquiv1:r6(C.spread-(30+bPA)/cA),
+    spreadEquiv2:r6(C.spread-(30+2*bPA)/cA),
+    spreadEquivN:r6(C.spread-(30+sX*bPA)/cA),
+    ridBenvenuto:r6(30/cA),
+    eu,pun1k,pun:t.pun,mDF,mCF,mPF,mDB,mDV,mE,mP,
+    traspFisso:t.traspFisso,traspPot:t.traspPot,traspPotTot:r2(t.traspPot*kw),
+    traspVar:t.traspVar,traspVarTot:r2(t.traspVar*tot),
+    asos:t.asos,arim:t.arim,asosFisso:t.asosFisso||0,asosFissoNR:asosFissoNR,txKwh:txK,impon:r2(impon),
+    loss:r2(loss),kfv:r2(kfv),dispVar:t.dispVar
+  };
+}
+
+/* ============================================================  FORMATTERS  */
+const fe  = v => new Intl.NumberFormat("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2}).format(v)+" €";
+const fev = v => new Intl.NumberFormat("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+const fs  = v => v.toFixed(4).replace(".",",");
+const fn  = v => v.toFixed(2).replace(".",",");
+
+let lastResult=null,extraCount=0,extraValues=[];
+function _save(){for(let i=0;i<extraCount;i++){const e=document.getElementById("ext-ann-"+i);if(e)extraValues[i]=e.value;}}
+function toggleTipo() {
+  const tipo = document.querySelector('input[name=tipo]:checked').value;
+  const isBim = tipo === 'bimestrale';
+  document.getElementById('wrap-mese').style.display     = isBim ? 'none' : '';
+  document.getElementById('wrap-bimestre').style.display = isBim ? '' : 'none';
+  document.getElementById('kwh-label').textContent = isBim
+    ? 'Consumi del bimestre per fascia (kWh totali 2 mesi)'
+    : 'Consumi del mese per fascia (kWh)';
+  document.getElementById('kwh-hint').textContent = isBim
+    ? 'Inserisci i kWh totali del bimestre. Il simulatore calcola automaticamente la media mensile (÷ 2) per tutte le proiezioni.'
+    : 'Per la lettura su 12 mesi il simulatore usa automaticamente il consumo del mese × 12.';
+  updatePunBadge();
+  if(lastResult) calcola();
+}
+
+function updatePunBadge() {
+  const isBim = document.querySelector('input[name=tipo]:checked').value === 'bimestrale';
+  if(isBim) {
+    const key = document.getElementById('bimestre').value;
+    const pun = getBimPun(key);
+    const b = TB[key];
+    const el = document.getElementById('pun-badge-bim');
+    if(pun != null) {
+      el.className = 'pun-badge ok';
+      el.textContent = `PUN medio: ${pun.toFixed(2).replace('.',',')} €/MWh`;
+    } else {
+      el.className = 'pun-badge err';
+      el.textContent = 'PUN non disponibile — usa Aggiorna';
+    }
+    el.style.display = 'inline-flex';
+  } else {
+    const key = document.getElementById('mese').value;
+    const pun = T[key]?.pun;
+    const el = document.getElementById('pun-badge-mese');
+    if(pun != null) {
+      el.className = 'pun-badge ok';
+      el.textContent = `PUN: ${pun.toFixed(2).replace('.',',')} €/MWh`;
+    } else {
+      el.className = 'pun-badge err';
+      el.textContent = 'PUN mancante — usa Aggiorna';
+    }
+    el.style.display = 'inline-flex';
+  }
+}
+
+/* ============================================================  FETCH PUN  */
+async function fetchPUN() {
+  const apiKey = document.getElementById('api-key').value.trim();
+  if(!apiKey) { document.getElementById('fetch-status').textContent = '⚠ Inserisci la API key Anthropic (sk-ant-…)'; return; }
+  const btn = document.getElementById('btn-fetch');
+  const status = document.getElementById('fetch-status');
+  btn.disabled = true;
+  status.textContent = '🔄 Ricerca PUN su GME in corso…';
+
+  // Determine which months need fetching
+  const missing = Object.entries(T).filter(([k,v]) => v.pun == null).map(([k]) => k);
+  const estimated = Object.entries(T).filter(([k,v]) => v.pun != null && (k.includes('2025') || k === 'Gennaio 2026')).map(([k]) => k);
+  const targets = [...missing, ...estimated.slice(-1)]; // fetch missing + latest estimate
+
+  try {
+    const today = new Date();
+    const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    const query = `Trova i valori ufficiali del PUN Index GME (Prezzo Unico Nazionale medio mensile in €/MWh) per questi mesi: ${targets.join(', ')}.
+Cerca su mercatoelettrico.org sezione Statistiche/PUN oppure su GME gme.it pubblicazioni mensili.
+Per il mese corrente (${mesi[today.getMonth()]} ${today.getFullYear()}) usa la media dei giorni disponibili se il mese non è ancora concluso.
+Rispondi SOLO con un oggetto JSON, nessun altro testo: {"valori": [{"mese": "Aprile 2026", "pun": 123.45, "tipo": "definitivo"}, ...]}`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: query }]
+      })
+    });
+
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+
+    const allText = data.content.filter(c => c.type === 'text').map(c => c.text).join('');
+    const match = allText.match(/\{[\s\S]*"valori"[\s\S]*\}/);
+    if(!match) throw new Error('Risposta non parsabile: ' + allText.slice(0,120));
+
+    const result = JSON.parse(match[0]);
+    let updated = [];
+    for(const v of result.valori || []) {
+      if(T[v.mese] && v.pun) {
+        T[v.mese].pun = parseFloat(v.pun);
+        T[v.mese].punTipo = v.tipo || 'aggiornato';
+        updated.push(`${v.mese}: ${parseFloat(v.pun).toFixed(2)} €/MWh`);
+      }
+    }
+    if(updated.length) {
+      status.textContent = '✅ Aggiornati: ' + updated.join(' | ');
+      updatePunBadge();
+      if(lastResult) calcola();
+    } else {
+      status.textContent = '⚠ Nessun valore riconosciuto nella risposta. Riprova o aggiorna manualmente.';
+    }
+  } catch(e) {
+    status.textContent = '❌ Errore: ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================  CALCOLA  */
+function calcola(){
+  const profilo=document.getElementById("profilo").value;
+  const kw=parseFloat(document.getElementById("kw").value);
+  const f1raw=parseFloat(document.getElementById("f1").value)||0;
+  const f2raw=parseFloat(document.getElementById("f2").value)||0;
+  const f3raw=parseFloat(document.getElementById("f3").value)||0;
+  const tariffaTipo=document.getElementById("tariffa-tipo").value;
+  const eb=document.getElementById("err-bar");eb.classList.remove("vis");
+
+  const isBim=document.querySelector('input[name=tipo]:checked').value==='bimestrale';
+  const divisore=isBim?2:1;
+  const f1=r2(f1raw/divisore),f2=r2(f2raw/divisore),f3=r2(f3raw/divisore);
+
+  let mese,tariffe,periodoLabel;
+  if(isBim){
+    const bKey=document.getElementById("bimestre").value;
+    const b=TB[bKey];
+    const punVal=getBimPun(bKey);
+    if(tariffaTipo==='variabile'&&punVal==null){eb.textContent="⚠ PUN non disponibile per "+bKey+".";eb.classList.add("vis");return;}
+    mese=b.m2; tariffe={...b.q,pun:punVal||0}; periodoLabel=bKey;
+  } else {
+    mese=document.getElementById("mese").value;
+    tariffe=T[mese];
+    if(!tariffe){eb.textContent="⚠ Mese non trovato.";eb.classList.add("vis");return;}
+    if(tariffaTipo==='variabile'&&tariffe.pun==null){eb.textContent="⚠ PUN non disponibile per "+mese+".";eb.classList.add("vis");return;}
+    periodoLabel=mese;
+  }
+
+  try{
+    _save();
+    if(tariffaTipo==='variabile'){
+      const r=calculateWith(mese,tariffe,f1,f2,f3,kw,profilo,periodoLabel,isBim,divisore);
+      r.tariffaTipo='variabile';
+      lastResult=r; renderAll(r);
+      document.getElementById('res-tariffa').style.display='none';
+    } else {
+      // Tariffa fissa: calcola mono, multi, e variabile per confronto
+      const rMono=calculateFixed(mese,tariffe,f1,f2,f3,kw,profilo,'mono',periodoLabel,isBim,divisore);
+      const rMulti=calculateFixed(mese,tariffe,f1,f2,f3,kw,profilo,'multi',periodoLabel,isBim,divisore);
+      const rVar=(tariffe.pun!=null)?calculateWith(mese,tariffe,f1,f2,f3,kw,profilo,periodoLabel,isBim,divisore):null;
+      if(rVar) rVar.tariffaTipo='variabile';
+      // Raccomanda il migliore fisso
+      const rBest=rMono.totale<=rMulti.totale?rMono:rMulti;
+      lastResult=rBest; renderAll(rBest);
+      renderTariffaComparison(rMono,rMulti,rVar);
+      document.getElementById('res-tariffa').style.display='block';
+    }
+    document.getElementById("result-wrap").classList.add("vis");
+    renderFields(); updatePunBadge();
+  }catch(e){eb.textContent="⚠ "+e.message;eb.classList.add("vis");}
+}
+
+/* ============================================================  RENDER ALL  */
+function renderAll(r){
+  const pL=r.profilo==="residente"?"Residente":"Non residente";
+  const bimBadge=r.isBim?`<span style="display:inline-block;margin-left:8px;background:var(--yellow-bg);color:#7A6000;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:5px;border:1px solid var(--yellow-bd)">bimestrale ÷ 2</span>`:"";
+
+  /* HEADER */
+  document.getElementById("res-header").innerHTML=`
+    <div class="rh-meta">
+      <div class="rh-tag">Periodo &middot; <span>${r.periodoLabel}</span>${bimBadge} &nbsp;&middot;&nbsp; Profilo &middot; <span>${pL}</span> &nbsp;&middot;&nbsp; Potenza &middot; <span>${r.kw} kW</span></div>
+      <div class="rh-title">${r.totalKwh} kWh/mese &nbsp;(F1: ${r.f1} &middot; F2: ${r.f2} &middot; F3: ${r.f3})${r.isBim?` <span style="font-size:.75rem;color:var(--muted)">— media mensile da ${r.totalKwh*2} kWh bimestrali</span>`:""}</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <div class="rh-amount"><div class="rh-alabel">Totale bolletta</div><div class="rh-aval">${fe(r.totale)}</div></div>
+      <div class="rh-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg></div>
+    </div>`;
+
+  /* BREAKDOWN */
+  const canRow=r.canone>0?`<div class="trow dimmed"><span class="t-name">Canone RAI</span><span class="t-val">${fe(r.canone)}</span></div>`:"";
+  const canNote=r.canone>0?`<div class="info-strip">&#128250; Canone RAI ${fe(r.canone)}/mese — addebitato nei mesi gennaio–ottobre. Non è abbattibile dagli sconti.</div>`:"";
+  document.getElementById("res-breakdown").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Dettaglio voci di spesa</span></div>
+    <div class="trow"><span class="t-name">Spesa materia energia</span><span class="t-val">${fe(r.materiaEnergia)}</span></div>
+    <div class="trow sub"><span class="t-name">di cui Corrispettivi Commercializzazione</span><span class="t-val">€ ${fn(r.corrispettivi)}</span></div>
+    <div class="trow bonus"><span class="t-name">↳ Bonus Nuovo Cliente / Porta un Amico (prime 3 bollette)</span><span class="t-val">&minus;€ 10,00</span></div>
+    <div class="trow"><span class="t-name">Trasporto e gestione contatore</span><span class="t-val">${fe(r.trasporto)}</span></div>
+    <div class="trow"><span class="t-name">Oneri di sistema${r.profilo!=='residente'?` <span style="font-size:.72rem;color:var(--sage)">(incl. ASOS fissa ${fe(r.asosFissoNR)})</span>`:''}</span><span class="t-val">${fe(r.oneri)}</span></div>
+    <div class="trow"><span class="t-name">Imposte (accisa — ${r.txKwh} kWh tassabili)</span><span class="t-val">${fe(r.imposte)}</span></div>
+    <div class="trow dimmed"><span class="t-name">IVA (10%)</span><span class="t-val">${fe(r.iva)}</span></div>
+    ${canRow}${canNote}`;
+
+  /* TOTALI */
+  document.getElementById("res-totali").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Totale fornitura</span></div>
+    <div class="trow total"><span class="t-name">Totale bolletta</span><span class="t-val">${fe(r.totale)}</span></div>
+    <div class="trow"><span class="t-name">Dalla 4&ordf; bolletta</span><span class="t-val">${fe(r.totaleDallaQuarta)}</span></div>
+    <div class="trow" style="border-bottom:none"><span class="t-name">Media mensile su 12 mesi${r.totaleEq12 < r.totaleDallaQuarta ? `<span style="display:block;font-size:.7rem;color:var(--sage);font-weight:400;margin-top:1px">Include il Bonus Nuovo Cliente delle prime 3 bollette spalmate su 12 mesi</span>` : ""}</span><span class="t-val">${fe(r.totaleEq12)}</span></div>`;
+
+  /* STRIP SIMULAZIONE MENSILE */
+  const isFissa = r.tariffaTipo==='mono'||r.tariffaTipo==='multi';
+  const stripTesto = r.isBim
+    ? `📅 Hai inserito consumi bimestrali (${r.totalKwh*2} kWh totali). <strong>Tutti i valori mostrati sono calcolati su base mensile</strong> — consumo diviso per 2 (${r.totalKwh} kWh/mese).`
+    : `📅 <strong>Tutti i valori mostrati sono calcolati su base mensile.</strong>`;
+  const stripTariff = isFissa
+    ? ` &nbsp;|&nbsp; Tariffa: <strong>Fissa ${r.tariffaTipo==='mono'?'Monoraria':'Multioraria'}</strong>`
+    : ` &nbsp;|&nbsp; Tariffa: <strong>Variabile (PUN + spread)</strong>`;
+  document.getElementById("res-strip").innerHTML = `
+    <div style="background:var(--yellow-bg);border:1px solid var(--yellow-bd);border-radius:8px;padding:10px 16px;font-size:.78rem;color:#7A6000;line-height:1.5;margin-bottom:10px">
+      ${stripTesto}${stripTariff} &nbsp;|&nbsp; Profilo: <strong>${r.profilo==='residente'?'Domestico Residente':'Domestico Non Residente'}</strong>
+    </div>`;
+  document.getElementById('res-segn').style.display = isFissa ? 'none' : '';
+
+  if(!isFissa) {
+    const si=r.segnalazioniPerZero<=0
+      ?"Hai già raggiunto un livello di vantaggio che azzera il costo equivalente dello spread."
+      :r.segnalazioniPerZero===1
+        ?"Con un segnalato medio da 250 kWh/mese ti basta 1 segnalazione per azzerare il costo dello spread."
+        :`Con un segnalato medio da 250 kWh/mese ti servono ${r.segnalazioniPerZero} segnalazioni per azzerare il costo dello spread.`;
+    const {s1,s2,sN}=r,showN=r.segnalazioniPerZero>2;
+    const det=`1) Consumo mensile simulato = ${fn(r.consumoMensile)} kWh
+2) Consumo annuo simulato = ${fn(r.consumoAnnuo)} kWh
+3) Spread nominale = ${fs(r.spreadNominale)} EUR/kWh
+4) Bonus iniziale totale = EUR ${fn(r.bonusBenvenutoTot)}
+5) Bonus iniziale medio mensile su 12 mesi = EUR ${fn(r.bonusBenvenutoMedio)}
+6) Riduzione equivalente spread bonus iniziale = ${fs(r.ridBenvenuto)} EUR/kWh
+7) Spread equivalente con solo bonus iniziale = ${fs(r.spreadEq12)} EUR/kWh
+8) Totale prime 3 bollette = EUR ${fn(r.totale)}
+9) Totale dalla 4a bolletta = EUR ${fn(r.totaleDallaQuarta)}
+10) Media mensile su 12 mesi = EUR ${fn(r.totaleEq12)}
+11) Sconto mensile per segnalazione media (250 kWh) = EUR ${fn(r.scontoAmicoMedioMese)}
+12) Beneficio annuo per segnalazione media = EUR ${fn(r.beneficioPerSegnPerAnno)}
+13) Con 1 segn.: spread equiv. = ${fs(r.spreadEquiv1)} EUR/kWh
+14) Con 2 segn.: spread equiv. = ${fs(r.spreadEquiv2)} EUR/kWh
+15) Segnalazioni per spread zero = ${r.segnalazioniPerZero}`;
+    const tR=showN?`<div class="scen-data-row"><div class="s-label"><span class="s-badge">${r.segnalazioniPerZero}</span>Con ${r.segnalazioniPerZero} segnalazioni</div><div class="s-val">${fe(sN.prime3)}</div><div class="s-val">${fe(sN.quarta)}</div><div class="s-val">${fe(sN.media12)}</div></div>`:"";
+    document.getElementById("res-segn").innerHTML=`
+      <div class="rblock-head" style="background:var(--green-lt);border-bottom-color:var(--green-md)"><span class="rblock-head-title" style="color:var(--sage)">Simulazione vantaggi su 12 mesi</span></div>
+      <div class="segn-kpi">
+        <div class="kpi-left"><div class="kpi-label">Segnalazioni utili &middot; segnalato medio 250 kWh/mese</div>
+          <div class="kpi-val"><span class="kpi-num">${r.segnalazioniPerZero}</span><span class="kpi-unit">segnalazioni</span></div></div>
+        <div class="kpi-tags"><span class="ktag ktag-yellow">Spread ${fs(r.spreadNominale)} &euro;/kWh</span><span class="ktag ktag-green">Target ${fs(r.spreadEquivN)} &euro;/kWh</span></div>
+      </div>
+      <div class="segn-intro-strip">${si}</div>
+      <div class="scen-row-head"><span>Scenario</span><span>1ª-3ª</span><span>Dalla 4&ordf;</span><span>Media 12 mesi</span></div>
+      <div class="scen-data-row"><div class="s-label"><span class="s-badge">1</span>1 segnalazione</div><div class="s-val">${fe(s1.prime3)}</div><div class="s-val">${fe(s1.quarta)}</div><div class="s-val">${fe(s1.media12)}</div></div>
+      <div class="scen-data-row"><div class="s-label"><span class="s-badge">2</span>2 segnalazioni</div><div class="s-val">${fe(s2.prime3)}</div><div class="s-val">${fe(s2.quarta)}</div><div class="s-val">${fe(s2.media12)}</div></div>
+      ${tR}
+      <button class="acc-trigger" onclick="toggleAcc('acc-det',this)"><span class="chev">&#9660;</span> Dettaglio conteggi</button>
+      <div class="acc-panel" id="acc-det"><pre>${det}</pre></div>`;
+  }
+
+  /* GIOCA CON LE SEGNALAZIONI */
+  document.getElementById("res-segn-play").innerHTML=`
+    <div class="rblock-head" style="background:var(--green-lt);border-bottom-color:var(--green-md)">
+      <span class="rblock-head-title" style="color:var(--sage)">🎯 Gioca con le segnalazioni</span>
+    </div>
+    <div class="play-intro">
+      <strong>Divertiti a scoprire con quante segnalazioni puoi azzerare totalmente il costo della bolletta.</strong><br>
+      Calcoliamo quanto risparmieresti ogni mese ipotizzando un segnalato medio che consuma <strong>250 kWh/mese</strong>.
+      Gli sconti si applicano sulla bolletta (IVA inclusa) e riguardano i costi in materia di energia, gli oneri e le tasse.
+      Ad eccezione del <em>Canone RAI</em>${r.canone>0?" ("+fe(r.canone)+"/mese), che rimane invariato":""}.
+    </div>
+    <div class="play-ctrl">
+      <label>Numero di segnalazioni:</label>
+      <input type="number" id="play-n" min="0" max="99" step="1" value="1" oninput="updatePlay()">
+      <span class="play-hint">Ogni segnalazione genera uno sconto<br>mensile sulla tua bolletta</span>
+    </div>
+    <div id="play-results"></div>
+    <div class="play-boll-wrap">
+      <button class="btn-bolletta outline" id="play-boll-btn" onclick="openBollettaPlay()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
+        <span id="play-boll-label">Vedi anteprima bolletta con 1 segnalazione</span>
+      </button>
+    </div>`;
+  updatePlay();
+
+  /* ALTRE UTENZE */
+  document.getElementById("res-ext").innerHTML=`
+    <div class="rblock-head" style="background:var(--yellow-bg);border-bottom-color:var(--yellow-bd)">
+      <span class="rblock-head-title" style="color:#7A6000">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A6000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg>
+        Risparmia fin da subito
+      </span>
+    </div>
+    <div class="ext-promo-head">
+      <div class="ext-promo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg>
+      </div>
+      <div class="ext-promo-text">
+        <h3>Hai già altre utenze a tuo nome?</h3>
+        <p>Inserisci le bollette che hai già a tuo nome e scopri subito quanto potresti risparmiare in più, fin dal primo mese.</p>
+      </div>
+    </div>
+    <div class="ext-ctrl-strip" style="margin-top:14px">
+      <label>Numero altre utenze:</label>
+      <select id="ext-count" onchange="setExtraCount(parseInt(this.value))">
+        <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+      </select>
+    </div>
+    <div class="ext-body">
+      <div class="ext-fields-grid" id="ext-fields-inner"></div>
+      <button class="btn-recalc" id="ext-calc-btn" onclick="renderExtraResult()">&#8635; Ricalcola con questi sconti</button>
+      <div id="ext-res-rows"></div>
+    </div>
+    <div class="ext-res-section" id="ext-boll-section" style="display:none">
+      <button class="btn-bolletta outline" style="margin-bottom:14px" onclick="openBollettaUtenze()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
+        Vedi anteprima bolletta con le utenze a tuo nome
+      </button>
+    </div>`;
+
+  /* DETTAGLIO MATERIA ENERGIA */
+  const accDet = isFissa
+    ? `Tipo tariffa        = FISSA ${r.tariffaTipo==='mono'?'MONORARIA':'MULTIORARIA'}
+Prezzo monorario    = ${FISSO.mono.toFixed(4)} EUR/kWh (perdite incluse)
+Prezzo F1           = ${FISSO.f1.toFixed(4)} EUR/kWh
+Prezzo F2           = ${FISSO.f2.toFixed(4)} EUR/kWh
+Prezzo F3           = ${FISSO.f3.toFixed(4)} EUR/kWh
+-------------------------------------------
+Disp. Terna fisso   = ${fe(r.mDF)}
+Comm. vendita (CCV) = ${fe(r.mCF)}
+Bonus N.Cliente     = ${fe(r.mPF)}
+DispBT fisso        = ${fe(r.mDB)}
+Disp. var. su ${fn(r.kfv)} kfv = ${fe(r.mDV)}
+Costo energia fisso = ${fe(r.mE)}
+(perdite già incluse nel prezzo)
+-------------------------------------------
+kWh tassabili accisa = ${fn(r.txKwh)} kWh${r.profilo==="residente"?" (franchigia applicata)":""}`
+    : `PUN ${r.pun} EUR/MWh → ${(r.pun/1000).toFixed(5)} EUR/kWh
+Spread nominale netto   = 0,034000 EUR/kWh
+Spread lordo (perdite)  = 0,037400 EUR/kWh
+Prezzo unitario (eu)    = ${r.eu.toFixed(5)} EUR/kWh
+-------------------------------------------
+Disp. Terna fisso       = ${fe(r.mDF)}
+Comm. vendita (CCV)     = ${fe(r.mCF)}
+Bonus N.Cliente/P.Amico = ${fe(r.mPF)}
+DispBT fisso            = ${fe(r.mDB)}
+Disp. var. su ${fn(r.kfv)} kfv = ${fe(r.mDV)}
+Costo energia (eu×tot)  = ${fe(r.mE)}
+Costo perdite (eu×loss) = ${fe(r.mP)}
+-------------------------------------------
+kWh tassabili accisa    = ${fn(r.txKwh)} kWh${r.profilo==="residente"?" (franchigia applicata)":""}`;
+
+  document.getElementById("res-det").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Dettaglio materia energia</span></div>
+    <button class="acc-trigger" style="border-top:none" onclick="toggleAcc('acc-mat',this)"><span class="chev">&#9660;</span> Espandi dettaglio</button>
+    <div class="acc-panel" id="acc-mat"><pre>${accDet}</pre></div>`;
+}
+
+/* ============================================================  CONFRONTO TARIFFE  */
+function renderTariffaComparison(rMono, rMulti, rVar) {
+  const box = document.getElementById('res-tariffa');
+  if(!box) return;
+
+  const bestFissa = rMono.totale <= rMulti.totale ? 'mono' : 'multi';
+  const bestFissaR = bestFissa === 'mono' ? rMono : rMulti;
+  const varMigliore = rVar && rVar.totale < bestFissaR.totale;
+
+  // Calcola differenza % tra mono e multi
+  const diffAbs = Math.abs(rMono.totale - rMulti.totale);
+  const diffPct = r2(diffAbs / Math.max(rMono.totale, rMulti.totale) * 100);
+
+  // Prezzi per kWh effettivi multi (media ponderata)
+  const tot = rMono.totalKwh;
+
+  const cardMono = `
+    <div class="tariffa-card${bestFissa==='mono'?' winner':''}">
+      ${bestFissa==='mono'?'<div class="tc-badge green">✓ Consigliata</div>':''}
+      <div class="tc-title">Monoraria</div>
+      <div class="tc-price${bestFissa==='mono'?' green':''}">${fe(rMono.totale)}</div>
+      <div class="tc-sub">Dalla 4ª: ${fe(rMono.totaleDallaQuarta)}<br>Media 12 mesi: ${fe(rMono.totaleEq12)}</div>
+      <div class="tc-prezzo">0,1991 €/kWh su tutti i consumi<br><span style="font-size:.7rem;color:var(--light)">prezzo comprensivo delle perdite di rete</span></div>
+    </div>`;
+
+  const cardMulti = `
+    <div class="tariffa-card${bestFissa==='multi'?' winner':''}">
+      ${bestFissa==='multi'?'<div class="tc-badge green">✓ Consigliata</div>':''}
+      <div class="tc-title">Multioraria</div>
+      <div class="tc-price${bestFissa==='multi'?' green':''}">${fe(rMulti.totale)}</div>
+      <div class="tc-sub">Dalla 4ª: ${fe(rMulti.totaleDallaQuarta)}<br>Media 12 mesi: ${fe(rMulti.totaleEq12)}</div>
+      <div class="tc-prezzo">F1: 0,2112 · F2: 0,2013 · F3: 0,1936 €/kWh<br><span style="font-size:.7rem;color:var(--light)">prezzi comprensivi delle perdite di rete</span></div>
+    </div>`;
+
+  const recoText = bestFissa==='mono'
+    ? `Con i tuoi consumi (F1: ${rMono.f1} kWh · F2+F3: ${rMono.f2+rMono.f3} kWh) la tariffa <strong>monoraria conviene</strong> di <strong>${fe(diffAbs)}/mese</strong> rispetto alla multioraria.`
+    : `Con i tuoi consumi (F1: ${rMulti.f1} kWh · F2+F3: ${rMulti.f2+rMulti.f3} kWh) la tariffa <strong>multioraria conviene</strong> di <strong>${fe(diffAbs)}/mese</strong> rispetto alla monoraria. Il peso delle fasce F2/F3 abbassa il costo medio.`;
+
+  const varWarnHtml = rVar ? (() => {
+    const diff = r2(bestFissaR.totale - rVar.totale);
+    const fissaPiuCara = diff > 0;
+    const diffLabel = Math.abs(diff);
+    return `
+    <div class="rblock" style="margin-top:10px;overflow:hidden">
+      <div class="rblock-head" style="background:var(--yellow-bg);border-bottom-color:var(--yellow-bd)">
+        <span class="rblock-head-title" style="color:#7A6000">⚡ Confronto con Tariffa Variabile — PUN ${fn(rVar.pun)} €/MWh</span>
+      </div>
+      <div style="padding:14px 18px;font-size:.85rem;color:var(--ink2);line-height:1.6">
+        <strong>Hai scelto la tariffa fissa.</strong> Con il PUN attuale di <strong>${fn(rVar.pun)} €/MWh</strong>,
+        ecco cosa avresti speso con la tariffa variabile:
+      </div>
+      <div class="tariffa-cards" style="padding-top:0">
+        <div class="tariffa-card${!fissaPiuCara?' winner':''}">
+          ${!fissaPiuCara?'<div class="tc-badge green">✓ Più conveniente</div>':''}
+          <div class="tc-title">Tariffa fissa (${bestFissa==='mono'?'monoraria':'multioraria'})</div>
+          <div class="tc-price${!fissaPiuCara?' green':''}">${fe(bestFissaR.totale)}</div>
+          <div class="tc-sub">Dalla 4ª: ${fe(bestFissaR.totaleDallaQuarta)}<br>Media 12 mesi: ${fe(bestFissaR.totaleEq12)}</div>
+          <div class="tc-prezzo" style="color:var(--green-dk);font-weight:700">Prezzo certo per 12 mesi</div>
+        </div>
+        <div class="tariffa-card${fissaPiuCara?' variabile-warn':''}">
+          ${fissaPiuCara?'<div class="tc-badge yellow">Più conveniente ora</div>':''}
+          <div class="tc-title">Tariffa variabile</div>
+          <div class="tc-price">${fe(rVar.totale)}</div>
+          <div class="tc-sub">Dalla 4ª: ${fe(rVar.totaleDallaQuarta)}<br>Media 12 mesi: ${fe(rVar.totaleEq12)}</div>
+          <div class="tc-prezzo" style="color:#7A6000">Segue le oscillazioni del PUN mensile</div>
+        </div>
+      </div>
+      <div class="${fissaPiuCara?'tariffa-warn':'tariffa-reco'}" style="margin-top:0">
+        ${fissaPiuCara
+          ? `⚠️ Con il PUN attuale la tariffa variabile costerebbe <strong>${fe(diffLabel)} in meno al mese</strong>. La tariffa fissa ti protegge però da eventuali rialzi del PUN nei prossimi 12 mesi.`
+          : `✅ La tariffa fissa è più conveniente di <strong>${fe(diffLabel)}/mese</strong> rispetto alla variabile con il PUN attuale. Ottima scelta!`
+        }
+      </div>
+    </div>`;
+  })() : '';
+
+  box.innerHTML = `
+    <div class="rblock" style="overflow:visible">
+      <div class="rblock-head" style="background:var(--green-lt);border-bottom-color:var(--green-md)">
+        <span class="rblock-head-title" style="color:var(--sage)">🔒 Confronto Tariffa Fissa — Mono vs Multi</span>
+      </div>
+      <div class="tariffa-cards">${cardMono}${cardMulti}</div>
+      <div class="tariffa-reco">💡 ${recoText}</div>
+    </div>
+    ${varWarnHtml}`;
+}
+
+/* ============================================================  PLAY SEGNALAZIONI  */
+function updatePlay(){
+  if(!lastResult) return;
+  const r=lastResult;
+  const n=parseInt(document.getElementById("play-n")?.value)||0;
+
+  // sconto per segnalazione (segnalato medio 250 kWh/mese)
+  const sP3 = r.bonusMensileReferral + r.scontoAmicoMedioMese; // 10 + 2.5 = 12.5 €/mese (prime 3)
+  const sQ4 = r.scontoAmicoMedioMese;                          //  0 + 2.5 =  2.5 €/mese (dalla 4ª, no NC)
+  const cM  = r.profilo==="residente" ? 7.5 : 0;               // canone medio mensile (90€/12)
+
+  // floor corretto per ciascuno scenario: minimo pagabile = canone di quel mese
+  const totPrime3 = Math.max(r2(r.totale            - n * sP3), r.canone);
+  const totQuarta = Math.max(r2(r.totaleDallaQuarta - n * sQ4), r.canone);
+  // Media reale = (3 bollette prime3 + 9 bollette quarta) / 12
+  const totMedia  = r2((3 * totPrime3 + 9 * totQuarta) / 12);
+
+  const risparmio = r2(r.totale - totPrime3);
+  const minPossibile = r.canone>0 ? r.canone : 0;
+  const raggiuntoZero = totPrime3 <= minPossibile + 0.01;
+
+  const box=document.getElementById("play-results");
+  if(!box) return;
+
+  if(n===0){
+    box.innerHTML=`<div style="padding:12px 18px;font-size:.82rem;color:var(--muted)">Inserisci un numero di segnalazioni per vedere il calcolo.</div>`;
+  } else {
+    const saveLabel=risparmio>0?`<div class="saving-badge">
+      <span class="sb-icon">💚</span>
+      <span class="sb-text">Risparmio sulle prime 3 bollette<strong>&minus;${fe(risparmio)}/mese</strong></span>
+    </div>`:"";
+    const zeroNote=raggiuntoZero?`<div style="padding:10px 18px;background:var(--green-lt);border-top:1px solid var(--green-md);font-size:.8rem;color:var(--green-dk);font-weight:700">🎉 Con ${n} segnalazion${n===1?"e":"i"} la tua bolletta${r.canone>0?" scende al solo Canone RAI ("+fe(r.canone)+")":" si azzera completamente"}!</div>`:"";
+    box.innerHTML=`
+      ${saveLabel}
+      <div style="height:10px"></div>
+      <div class="play-tot-row${totPrime3<=minPossibile+0.01?' highlight':''}">
+        <span class="pt-label">Totale bolletta</span>
+        <span class="pt-val">${fe(totPrime3)}</span>
+      </div>
+      <div class="play-tot-row">
+        <span class="pt-label">Dalla 4ª bolletta</span>
+        <span class="pt-val">${fe(totQuarta)}</span>
+      </div>
+      <div class="play-tot-row" style="border-bottom:none">
+        <span class="pt-label">
+          Media mensile su 12 mesi
+          ${totMedia === 0 && totQuarta > 0
+            ? `<span style="display:block;font-size:.7rem;color:var(--sage);font-weight:500;margin-top:2px">La media include il Bonus Nuovo Cliente (−10€/mese × 3 bollette) distribuito sui 12 mesi, che abbassa la media al di sotto del costo dalla 4ª bolletta.</span>`
+            : totMedia < totQuarta
+              ? `<span style="display:block;font-size:.7rem;color:var(--sage);font-weight:500;margin-top:2px">La media è inferiore alla 4ª bolletta perché include il Bonus Nuovo Cliente delle prime 3 bollette.${r.canone>0?` Nov/Dic: ${fe(0)} (nessun Canone RAI)`:""}</span>`
+              : ""}
+        </span>
+        <span class="pt-val">${fe(totMedia)}</span>
+      </div>
+      ${zeroNote}`;
+  }
+
+  const lbl=document.getElementById("play-boll-label");
+  if(lbl) lbl.textContent=n>0?`Vedi anteprima bolletta con ${n} segnalazion${n===1?"e":"i"}`:"Vedi anteprima bolletta base";
+}
+
+function openBollettaPlay(){
+  if(!lastResult)return;
+  const n=parseInt(document.getElementById("play-n")?.value)||0;
+  const sNC=n*10, sPA=r2(n*C.friendDisc*250);
+  const lbl=n>0?`con ${n} Segnalazion${n===1?"e":"i"}`:"";
+  openBolletta(sNC,sPA,lbl);
+}
+
+/* ============================================================  EXTRA UTENZE  */
+function setExtraCount(n){_save();extraCount=n;while(extraValues.length<n)extraValues.push("");renderFields();}
+function extraAnnui(){_save();return Array.from({length:extraCount},(_,i)=>parseFloat(extraValues[i])).filter(v=>!isNaN(v)&&v>0);}
+
+function renderFields(){
+  const box=document.getElementById("ext-fields-inner");if(!box)return;
+  box.innerHTML="";
+  for(let i=0;i<extraCount;i++){const v=extraValues[i]||"";box.innerHTML+=`<div class="fg"><label>Utenza ${i+1} — consumo annuo (kWh)</label><input type="number" id="ext-ann-${i}" min="1" step="100" value="${v}" placeholder="es. 2000"></div>`;}
+  const b=document.getElementById("ext-calc-btn");if(b)b.style.display=extraCount>0?"inline-block":"none";
+  const s=document.getElementById("ext-count");if(s)s.value=String(extraCount);
+}
+
+function renderExtraResult(){
+  _save();
+  const box=document.getElementById("ext-res-rows");if(!box||!lastResult)return;
+  const a=extraAnnui();
+  if(!a.length){
+    box.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:4px 0">Inserisci il consumo annuo per ciascuna utenza, poi clicca Ricalcola.</div>';
+    document.getElementById("ext-boll-section").style.display="none";
+    return;
+  }
+  const r=lastResult;
+  const bollSenzaCan=r2(r.impon+r.iva);
+  const minPossibile=r.canone>0?r.canone:0;
+  const cM=r.profilo==="residente"?7.5:0;
+
+  // Prime 3: NC bonus (10€/utenza) + PA mensile
+  const sNCExt=a.length*10;
+  const sPAExt=r2(a.reduce((s,v)=>s+C.friendDisc*v/12,0));
+  const scontoP3=Math.min(sNCExt+sPAExt, bollSenzaCan);
+
+  // Dalla 4a: solo PA mensile
+  const scontoQ4=Math.min(sPAExt, r2(r.totaleDallaQuarta-r.canone));
+
+  // Media 12 mesi: NC ammortizzato + PA mensile
+  const scontoMedia=r2(a.reduce((s,v)=>s+(30+C.friendDisc*v)/12,0));
+  const bollSenzaCanMedia=r2(r.totaleEq12-cM);
+
+  const totP3   =Math.max(r2(r.totale            - scontoP3),    minPossibile);
+  const totQ4   =Math.max(r2(r.totaleDallaQuarta  - scontoQ4),    minPossibile);
+  // Media reale = (3 × prime3 + 9 × quarta) / 12
+  const totMedia= r2((3 * totP3 + 9 * totQ4) / 12);
+
+  box.innerHTML=`
+    <div class="trow total" style="margin-top:8px"><span class="t-name">Totale bolletta</span><span class="t-val">${fe(totP3)}</span></div>
+    <div class="trow"><span class="t-name">Dalla 4ª bolletta</span><span class="t-val">${fe(totQ4)}</span></div>
+    <div class="trow" style="border-bottom:none">
+      <span class="t-name">
+        Media mensile su 12 mesi
+        ${totMedia<totQ4?'<span style="display:block;font-size:.7rem;color:var(--sage);font-weight:500;margin-top:2px">Include le prime 3 bollette scontate, per questo la media è inferiore alla 4ª bolletta</span>':""}
+      </span>
+      <span class="t-val">${fe(totMedia)}</span>
+    </div>`;
+
+  document.getElementById("ext-boll-section").style.display="block";
+}
+
+function openBollettaUtenze(){
+  if(!lastResult)return;
+  const a=extraAnnui();
+  if(!a.length)return;
+  const n=a.length;
+  const sNC=n*10;
+  const sPA=r2(a.reduce((s,v)=>s+C.friendDisc*v/12,0));
+  openBolletta(sNC,sPA,`con ${n} Utenz${n===1?"a":"e"} a Tuo Nome`);
+}
+
+/* ============================================================  SCONTRINO ENERGIA  */
+function buildScontrino(r, scontoNC, scontoPA) {
+  const tot = r.totalKwh;
+  if(!tot) return '';
+  const isFissa = r.tariffaTipo==='mono'||r.tariffaTipo==='multi';
+
+  // ---- QUOTA PER CONSUMI ----
+  // Spesa vendita: componenti variabili energia (al netto degli sconti fissi PdP)
+  const vendConsumi = isFissa
+    ? r2(r.mDV + r.mE)               // dispVar×kfv + prezzo_fisso×tot
+    : r2(r.mDV + r.mE + r.mP);       // dispVar×kfv + eu×kfv (energia+perdite)
+  // Sottrai sconti referral (in bolletta reale riduce vendita consumi)
+  const scontiVar = r2(scontoNC + scontoPA);
+  const vendConsumiNet = r2(vendConsumi - scontiVar);
+  // Spesa rete per consumi: trasporto var + ASOS var + ARIM var
+  const reteConsumi = r2(r.traspVarTot + r.asos*tot + r.arim*tot);
+  const totConsumi  = r2(vendConsumiNet + reteConsumi);
+  // Prezzi medi per kWh (6 decimali come in bolletta reale)
+  const pmVend = tot ? (vendConsumiNet/tot) : 0;
+  const pmRete = tot ? (reteConsumi/tot) : 0;
+  const pmTot  = tot ? (totConsumi/tot) : 0;
+  const fmt6 = v => (v>=0?'+':'')+v.toFixed(6).replace('.',',');
+  const fmt6n = v => v.toFixed(6).replace('.',',');
+
+  // ---- QUOTA FISSA ----
+  // Vendita fissa: DispTerna + CCV + DispBT + BonusNC(-10€)
+  const vendFissa = r2(r.mDF + r.mCF + r.mDB + r.mPF); // mPF già = -10 se in prime 3
+  // Rete fissa: trasporto fisso + ASOS fissa (solo NR)
+  const reteFissa = r2(r.traspFisso + r.asosFissoNR);
+  // Rete potenza
+  const retePot   = r2(r.traspPotTot);
+
+  // ---- ACCISE E IVA ----
+  // Usa valori già corretti (con sconti applicati)
+  const impShow  = r.txKwh > 0 ? r.imposte : 0;
+  const ivaShow  = r2((r.impon - scontiVar) * (C.iva/100));
+  const accIva   = r2(impShow + ivaShow);
+
+  // ---- TOTALI ----
+  const bolletta = r2(r.impon - scontiVar + ivaShow);
+  const totForn  = r2(bolletta + r.canone);
+
+  // Riga restituzione crediti (solo se bolletta < 0, non applicabile qui)
+  const noteConsumi = isFissa
+    ? `<small style="color:#888;display:block;margin-top:2px">Perdite di rete incluse nel prezzo fisso contrattuale</small>`
+    : ``;
+
+  return `
+  <div style="padding:12px 16px 8px;background:var(--yellow-bg);border-bottom:1px solid var(--yellow-bd);font-size:.78rem;color:#7A6000;line-height:1.5">
+    💡 Lo <strong>Scontrino dell'Energia</strong> è il riepilogo sintetico presente in ogni bolletta reale. Mostra il costo medio per kWh (che può essere negativo se hai molti sconti), le quote fisse mensili e il totale da pagare.
+  </div>
+  <div class="scontrino-wrap">
+    <div class="scontrino-title">— SCONTRINO DELL'ENERGIA</div>
+    <table class="scontrino-table">
+      <thead>
+        <tr><th>Quantità</th><th>Prezzo medio</th><th>Importi</th></tr>
+      </thead>
+      <tbody>
+        <!-- QUOTA PER CONSUMI -->
+        <tr class="sc-section-head"><td colspan="3">Quota per consumi</td></tr>
+        <tr class="sc-main">
+          <td><strong>${tot} kWh</strong></td>
+          <td class="sc-pm">${fmt6(pmTot)} €/kWh</td>
+          <td class="sc-imp">${fev(totConsumi)} €</td>
+        </tr>
+        <tr class="sc-sub">
+          <td colspan="2" style="padding-left:16px">di cui spesa per la vendita di energia elettrica${noteConsumi}</td>
+          <td class="sc-imp"><span style="color:#888;font-size:.7rem">${fmt6n(pmVend)} €/kWh</span>&nbsp;&nbsp;&nbsp;${fev(vendConsumiNet)} €</td>
+        </tr>
+        <tr class="sc-sub">
+          <td colspan="2" style="padding-left:16px">di cui spesa per la rete e gli oneri generali di sistema</td>
+          <td class="sc-imp"><span style="color:#888;font-size:.7rem">+${fmt6n(pmRete)} €/kWh</span>&nbsp;&nbsp;&nbsp;+${fev(reteConsumi)} €</td>
+        </tr>
+        <!-- QUOTA FISSA E POTENZA -->
+        <tr class="sc-section-head"><td colspan="3">Quota fissa e Quota Potenza</td></tr>
+        <tr class="sc-main">
+          <td><strong>1 mese</strong></td>
+          <td class="sc-pm">${(r.mCF).toFixed(3).replace('.',',')} €/mese</td>
+          <td class="sc-imp">+${fev(r2(vendFissa + reteFissa))} €</td>
+        </tr>
+        <tr class="sc-sub">
+          <td colspan="2" style="padding-left:16px">di cui spesa per la vendita di energia elettrica</td>
+          <td class="sc-imp"><span style="color:#888;font-size:.7rem">${vendFissa.toFixed(3).replace('.',',')} €/mese</span>&nbsp;&nbsp;&nbsp;${fev(vendFissa)} €</td>
+        </tr>
+        <tr class="sc-sub">
+          <td colspan="2" style="padding-left:16px">di cui spesa per la rete e gli oneri generali di sistema</td>
+          <td class="sc-imp"><span style="color:#888;font-size:.7rem">${reteFissa.toFixed(6).replace('.',',')} €/mese</span>&nbsp;&nbsp;&nbsp;+${fev(reteFissa)} €</td>
+        </tr>
+        <tr class="sc-main">
+          <td><strong>${r.kw} kW per 1 mese</strong></td>
+          <td class="sc-pm">${r.traspPot.toFixed(6).replace('.',',')} €/kW/mese</td>
+          <td class="sc-imp">+${fev(retePot)} €</td>
+        </tr>
+        <tr class="sc-sub">
+          <td colspan="2" style="padding-left:16px">di cui spesa per la rete e gli oneri generali di sistema</td>
+          <td class="sc-imp"><span style="color:#888;font-size:.7rem">${r.traspPot.toFixed(6).replace('.',',')} €/kW/mese</span>&nbsp;&nbsp;&nbsp;+${fev(retePot)} €</td>
+        </tr>
+        <!-- TOTALI -->
+        <tr class="sc-divider"><td colspan="3"></td></tr>
+        <tr class="sc-totline"><td colspan="2">Totale ricalcoli</td><td class="sc-imp">0,00 €</td></tr>
+        <tr class="sc-totline"><td colspan="2">Accise e IVA</td><td class="sc-imp">+${fev(accIva)} €</td></tr>
+        <tr class="sc-totline sc-bold"><td colspan="2">Totale bolletta</td><td class="sc-imp">= ${fev(bolletta)} €</td></tr>
+        ${r.canone>0?`<tr class="sc-totline"><td colspan="2">Canone di abbonamento RAI relativo al periodo</td><td class="sc-imp">+${fev(r.canone)} €</td></tr>`:''}
+        <tr class="sc-totline sc-bold sc-forn"><td colspan="2">Totale da Pagare</td><td class="sc-imp">= ${fev(totForn)} €</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>`;
+}
+/*
+  scontoNC: Bonus Nuovo Cliente totale (n × 10€) — per prime 3 bollette
+  scontoPA: Sconto Porta un Amico mensile totale
+  titoloExtra: stringa aggiuntiva per il titolo del modal
+  REGOLA: gli sconti non abbattono il Canone RAI.
+          Il minimo pagabile = Canone RAI (9€ gen-ott, 0 altrimenti).
+*/
+function openScontrino(){
+  if(!lastResult) return;
+  const r = lastResult;
+  document.getElementById("scontrino-body").innerHTML = buildScontrino(r, 0, 0);
+  const modal = document.getElementById("modal-scontrino");
+  modal.classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeScontrino(){
+  document.getElementById("modal-scontrino").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function openBolletta(scontoNC, scontoPA, titoloExtra){
+  if(!lastResult)return;
+  const r=lastResult;
+  const { d1, d2 }=periodoBolletta(r);
+
+  // ---- cap sconti: non si abbatte il canone RAI ----
+  const bollettaSenzaCanone=r2(r.impon+r.iva);
+  const scontoTot=scontoNC+scontoPA;
+  const scontoEffNC=r2(scontoNC*Math.min(1,bollettaSenzaCanone/Math.max(scontoTot,0.01)));
+  const scontoEffPA=r2(scontoPA*Math.min(1,bollettaSenzaCanone/Math.max(scontoTot,0.01)));
+  const impon_adj=Math.max(0, r2(r.impon-scontoNC-scontoPA));
+  const IVA_adj=r2(impon_adj*(C.iva/100));
+  const TOT_adj=r2(impon_adj+IVA_adj+r.canone); // minimo = canone RAI
+
+  const hasCan=r.canone>0;
+  const conSconti=(scontoNC+scontoPA)>0;
+
+  function tr(desc,periodo,qty,qunit,cu,cuUnit,imp,iva=10){
+    const neg=imp<0;
+    return `<tr>
+      <td>${desc}</td>
+      <td class="col-periodo" style="color:#777;font-size:.72rem">${periodo}</td>
+      <td class="col-qty">${qty} <span style="color:#888;font-size:.7rem">${qunit}</span></td>
+      <td class="col-cu">${cu.toFixed(6).replace(".",",")} <span style="color:#888;font-size:.7rem">${cuUnit}</span></td>
+      <td${neg?' class="boll-neg"':''}>${fev(imp)}</td>
+      <td class="td-iva">${iva}</td>
+    </tr>`;
+  }
+
+  const periodo=`${d1} - ${d2}`;
+
+  const rowsSconto=conSconti?[
+    scontoNC>0?tr(`Bonus Porta un Amico (${Math.round(scontoNC/10)} segn.)`,periodo,Math.round(scontoNC/10),"PdP/mese",-10.0,"€/PdP/mese",-scontoNC):"",
+    scontoPA>0?tr(`Bonus sui Consumi dei Tuoi Amici`,periodo,1,"PdP/mese",-scontoPA,"€/PdP/mese",-scontoPA):"",
+  ].join(""):"";
+
+  const isFissaBoll = r.tariffaTipo==='mono'||r.tariffaTipo==='multi';
+  const f23=r.f2+r.f3;
+  const pF1=Math.round(r.f1*0.1),pF23=Math.round(f23*0.1),pun1k=r.pun1k;
+  const e1Val=r2(pun1k*r.f1),e23Val=r2(pun1k*f23),qvVal=r2(C.spread*r.kfv);
+  const pF1Val=r2(pun1k*pF1),pF23Val=r2(pun1k*pF23);
+
+  const rowsEn = isFissaBoll ? [
+    tr("Corrispettivi Dispacciamento Terna (quote fisse)",periodo,1,"PdP/mese",r.mDF,"€/PdP/mese",r.mDF),
+    tr("Bonus Nuovo Cliente",periodo,1,"PdP/mese",C.pfAdj,"€/PdP/mese",C.pfAdj),
+    tr("Corrispettivi Commercializzazione e Vendita (quote fisse)",periodo,1,"PdP/mese",r.mCF,"€/PdP/mese",r.mCF),
+    tr("Corrispettivo DispBT",periodo,1,"PdP/mese",r.mDB,"€/PdP/mese",r.mDB),
+    tr("Corrispettivi Dispacciamento Terna (quote variabili)",periodo,r2(r.kfv),"kWh",r.dispVar,"€/kWh",r2(r.mDV)),
+    // Tariffa fissa: corrispettivo per il consumo (perdite incluse)
+    r.tariffaTipo==='mono'
+      ? tr("Corrispettivo per il consumo (monorario)",periodo,r.totalKwh,"kWh",FISSO.mono,"€/kWh",r2(FISSO.mono*r.totalKwh))
+      : [
+          r.f1>0?tr("Corrispettivo per il consumo F-1",periodo,r.f1,"kWh",FISSO.f1,"€/kWh",r2(FISSO.f1*r.f1)):"",
+          f23>0?tr("Corrispettivo per il consumo F-2/3",periodo,f23,"kWh",r.f2>0&&r.f3>0?FISSO.f2:r.f2>0?FISSO.f2:FISSO.f3,"€/kWh",r2(FISSO.f2*r.f2+FISSO.f3*r.f3)):"",
+        ].join(""),
+    rowsSconto,
+  ].join("") : [
+    tr("Corrispettivi Dispacciamento Terna (quote fisse)",periodo,1,"PdP/mese",r.mDF,"€/PdP/mese",r.mDF),
+    tr("Bonus Nuovo Cliente",periodo,1,"PdP/mese",C.pfAdj,"€/PdP/mese",C.pfAdj),
+    tr("Corrispettivi Commercializzazione e Vendita (quote fisse)",periodo,1,"PdP/mese",r.mCF,"€/PdP/mese",r.mCF),
+    tr("Corrispettivo DispBT",periodo,1,"PdP/mese",r.mDB,"€/PdP/mese",r.mDB),
+    tr("Corrispettivi Dispacciamento Terna (quote variabili)",periodo,r2(r.kfv),"kWh",r.dispVar,"€/kWh",r2(r.mDV)),
+    r.f1>0?tr("Energia Attiva F-1",periodo,r.f1,"kWh",pun1k,"€/kWh",e1Val):"",
+    f23>0?tr("Energia Attiva F-23",periodo,f23,"kWh",pun1k,"€/kWh",e23Val):"",
+    tr("Quota Variabile (spread)",periodo,r2(r.kfv),"kWh",C.spread,"€/kWh",qvVal),
+    r.f1>0&&pF1>0?tr("Perdite di Rete F-1",periodo,pF1,"kWh",pun1k,"€/kWh",pF1Val):"",
+    f23>0&&pF23>0?tr("Perdite di Rete F-23",periodo,pF23,"kWh",pun1k,"€/kWh",pF23Val):"",
+    rowsSconto,
+  ].join("");
+
+  const rowsTr=[
+    tr("Trasporto (quote fisse)",periodo,1,"PdP/mese",r.traspFisso,"€/PdP/mese",r.traspFisso),
+    tr("Trasporto (quote potenza)",periodo,r.kw,"kW/mese",r.traspPot,"€/kW/mese",r.traspPotTot),
+    tr("Trasporto (quote variabili)",periodo,r.totalKwh,"kWh",r.traspVar,"€/kWh",r.traspVarTot),
+  ].join("");
+
+  const rowsOn=[
+    r.asosFissoNR>0 ? tr("Componente ASOS a copertura dei costi per sostegno delle fonti rinn. e cog.(fissa)",periodo,1,"PdP/mese",r.asosFisso,"€/PdP/mese",r2(r.asosFissoNR)) : "",
+    tr("Componente ASOS a copertura dei costi per sostegno delle fonti rinn. e cog.(variabile)",periodo,r.totalKwh,"kWh",r.asos,"€/kWh",r2(r.asos*r.totalKwh)),
+    tr("Componente ARIM a copertura oneri relativi ad attività di interesse generale(variabile)",periodo,r.totalKwh,"kWh",r.arim,"€/kWh",r2(r.arim*r.totalKwh)),
+  ].join("");
+
+  const rowsImp=r.txKwh>0
+    ?tr("Imposte Erariali (accisa)",periodo,r.txKwh,"kWh",C.accisa,"€/kWh",r.imposte)
+    :`<tr><td colspan="6" style="padding:8px 10px;color:#888;font-size:.75rem">Nessuna accisa applicata (consumo entro la franchigia)</td></tr>`;
+
+  const canRow2=hasCan?`<div class="boll-totline"><span class="tl-label">TOTALE CANONE RAI</span><span class="tl-val">${fev(r.canone)} €</span></div>`:"";
+  const badgeSegn=conSconti&&titoloExtra?`<span style="display:inline-block;margin-left:12px;background:#2D7A4F;color:#fff;font-size:.7rem;font-weight:800;padding:2px 10px;border-radius:20px;vertical-align:middle">${titoloExtra}</span>`:"";
+  const savingBanner=conSconti?`<div style="background:#EBF5EE;border-bottom:1px solid #A8D4B5;padding:9px 20px;font-size:.78rem;color:#1F5C3A;font-weight:600">💚 Sconto applicato: <strong>${fev(Math.min(scontoTot,bollettaSenzaCanone))} €</strong> — Gli sconti riguardano energia, oneri e tasse (IVA inclusa).${hasCan?" Il Canone RAI ("+fe(r.canone)+") rimane invariato.":""}</div>`:""
+
+  const meShow=conSconti?r2(r.materiaEnergia-scontoNC-scontoPA):r.materiaEnergia;
+  const imponShow=conSconti?impon_adj:r.impon;
+  const ivaShow=conSconti?IVA_adj:r.iva;
+  const bollShow=r2(imponShow+ivaShow);
+  const totShow=conSconti?TOT_adj:r.totale;
+
+  document.getElementById("modal-title-text").textContent=
+    conSconti&&titoloExtra?`Anteprima Bolletta ${titoloExtra}`:"Anteprima Bolletta — Quadro di Dettaglio";
+
+  document.getElementById("boll-body").innerHTML=`
+    <div class="boll-quadro-header">
+      <div class="boll-quadro-title">Quadro di dettaglio dal ${d1} al ${d2}${badgeSegn}</div>
+    </div>
+    ${savingBanner}
+    <div class="boll-section-title">SPESA PER LA VENDITA DI ENERGIA ELETTRICA</div>
+    <div class="boll-table-wrap"><table class="boll-table">
+      <thead><tr><th>Descrizione</th><th class="col-periodo" style="text-align:left">Periodo</th><th class="col-qty">Quantità</th><th class="col-cu">Corrispettivo Unitario</th><th>Importo(€)</th><th class="ctr">IVA(%)</th></tr></thead>
+      <tbody>${rowsEn}</tbody>
+      <tfoot><tr><td>TOTALE</td><td class="col-periodo"></td><td class="col-qty"></td><td class="col-cu"></td><td>${fev(meShow)} €</td><td></td></tr></tfoot>
+    </table></div>
+    <div class="boll-section-title" style="margin-top:2px">SPESA TRASPORTO ENERGIA ELETTRICA E GESTIONE CONTATORE</div>
+    <div class="boll-table-wrap"><table class="boll-table">
+      <thead><tr><th>Descrizione</th><th class="col-periodo" style="text-align:left">Periodo</th><th class="col-qty">Quantità</th><th class="col-cu">Corrispettivo Unitario</th><th>Importo(€)</th><th class="ctr">IVA(%)</th></tr></thead>
+      <tbody>${rowsTr}</tbody>
+      <tfoot><tr><td>TOTALE</td><td class="col-periodo"></td><td class="col-qty"></td><td class="col-cu"></td><td>${fev(r.trasporto)} €</td><td></td></tr></tfoot>
+    </table></div>
+    <div class="boll-section-title" style="margin-top:2px">ONERI DI SISTEMA</div>
+    <div class="boll-table-wrap"><table class="boll-table">
+      <thead><tr><th>Descrizione</th><th class="col-periodo" style="text-align:left">Periodo</th><th class="col-qty">Quantità</th><th class="col-cu">Corrispettivo Unitario</th><th>Importo(€)</th><th class="ctr">IVA(%)</th></tr></thead>
+      <tbody>${rowsOn}</tbody>
+      <tfoot><tr><td>TOTALE</td><td class="col-periodo"></td><td class="col-qty"></td><td class="col-cu"></td><td>${fev(r.oneri)} €</td><td></td></tr></tfoot>
+    </table></div>
+    <div class="boll-section-title" style="margin-top:2px">IMPOSTE</div>
+    <div class="boll-table-wrap"><table class="boll-table">
+      <thead><tr><th>Descrizione</th><th class="col-periodo" style="text-align:left">Periodo</th><th class="col-qty">Quantità</th><th class="col-cu">Corrispettivo Unitario</th><th>Importo(€)</th><th class="ctr">IVA(%)</th></tr></thead>
+      <tbody>${rowsImp}</tbody>
+      <tfoot><tr><td>TOTALE</td><td class="col-periodo"></td><td class="col-qty"></td><td class="col-cu"></td><td>${fev(r.imposte)} €</td><td></td></tr></tfoot>
+    </table></div>
+    <div class="boll-totdoc">
+      <div class="boll-totdoc-title">— TOTALE DOCUMENTO</div>
+      <div class="boll-totdoc-grid">
+        <div class="boll-totline"><span class="tl-label">TOTALE IMPONIBILE</span><span class="tl-val">${fev(imponShow)} €</span></div>
+        <div class="boll-totline"><span class="tl-label">TOTALE IVA</span><span class="tl-val">${fev(ivaShow)} €</span></div>
+        <div class="boll-totline big"><span class="tl-label">TOTALE BOLLETTA</span><span class="tl-val">${fev(bollShow)} €</span></div>
+        ${canRow2}
+        <div class="boll-totline fornitura"><span class="tl-label">TOTALE FORNITURA</span><span class="tl-val">${fev(totShow)} €</span></div>
+      </div>
+    </div>
+    <div class="boll-note">
+      <strong>⚠ Documento a titolo esemplificativo e informativo</strong><br>
+      La presente anteprima è generata automaticamente a scopo puramente illustrativo e non costituisce documento contrattuale, fiscale o commerciale. I valori riportati sono simulati sulla base delle Condizioni Tecnico-Economiche vigenti e dei dati inseriti dall'utente; possono differire dalla bolletta reale in funzione dei consumi effettivi, dei prezzi PUN per fascia oraria, degli aggiornamenti tariffari ARERA e di eventuali variazioni contrattuali. Il presente documento non può essere utilizzato come prova di spesa, offerta vincolante o documento di supporto a terzi.<br><br>
+      * Spread contrattuale: 0,034000 €/kWh netto applicato ai kWh fatturati comprensivi delle perdite di rete (equiv. 0,037400 €/kWh sui soli kWh consumati). Simulazione basata sul PUN mensile medio, senza disaggregazione per fascia oraria F1/F2/F3.<br>
+      * Il "Bonus Nuovo Cliente" di −10,00 €/mese è riconosciuto nelle prime 3 bollette successive all'attivazione della fornitura del cliente segnalato.
+      ${conSconti?"<br>* Gli sconti si applicano sulla bolletta (IVA inclusa) e riguardano i costi in materia di energia, gli oneri e le tasse."+(hasCan?" Il Canone RAI ("+fe(r.canone)+"/mese) rimane invariato.":""):""}
+      ${hasCan?"<br>* Canone RAI 90,00 €/anno — addebitato in 10 rate mensili da 9,00 € nei mesi gennaio–ottobre.":""}
+    </div>`;
+
+  document.getElementById("modal-bolletta").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+/* ============================================================  HELPERS  */
+function periodoBolletta(r){
+  if(r.isBim) {
+    const key = document.getElementById('bimestre')?.value;
+    if(key && TB[key]) return { d1: TB[key].d1, d2: TB[key].d2 };
+  }
+  const mp={
+    "Novembre 2025":{d1:"01/11/2025",d2:"30/11/2025"},
+    "Dicembre 2025":{d1:"01/12/2025",d2:"31/12/2025"},
+    "Gennaio 2026": {d1:"01/01/2026",d2:"31/01/2026"},
+    "Febbraio 2026":{d1:"01/02/2026",d2:"28/02/2026"},
+    "Marzo 2026":   {d1:"01/03/2026",d2:"31/03/2026"},
+    "Aprile 2026":  {d1:"01/04/2026",d2:"30/04/2026"}
+  };
+  return mp[r.mese]||{d1:"01/01/2026",d2:"31/01/2026"};
+}
+function closeBolletta(){document.getElementById("modal-bolletta").classList.remove("open");document.body.style.overflow="";}
+function handleOverlayClick(e){if(e.target===document.getElementById("modal-bolletta"))closeBolletta();}
+function toggleAcc(id,btn){document.getElementById(id).classList.toggle("open");btn.querySelector(".chev").classList.toggle("open");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeBolletta();});
+["profilo","kw","f1","f2","f3"].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener("change",()=>{if(lastResult)calcola();});
+  if(el.tagName==="INPUT")el.addEventListener("input",()=>{if(lastResult)calcola();});
+});
+document.getElementById("mese").addEventListener("change",()=>{updatePunBadge();if(lastResult)calcola();});
+document.getElementById("bimestre").addEventListener("change",()=>{updatePunBadge();if(lastResult)calcola();});
+// init badges on load
+updatePunBadge();
+
+// ---- PRECOMPILA DA URL PARAMS (arriva da scan.html) ----
+(function(){
+  const p = new URLSearchParams(window.location.search);
+  if (!p.has('f1') && !p.has('mese')) return;
+  if (p.has('f1')) document.getElementById('f1').value = p.get('f1');
+  if (p.has('f2')) document.getElementById('f2').value = p.get('f2');
+  if (p.has('f3')) document.getElementById('f3').value = p.get('f3');
+  if (p.has('kw')) document.getElementById('kw').value = p.get('kw');
+  if (p.has('profilo')) document.getElementById('profilo').value = p.get('profilo');
+  if (p.has('tariffa')) { document.getElementById('tariffa-tipo').value = p.get('tariffa'); onTariffaTipoChange(); }
+  if (p.has('mese')) {
+    const m = p.get('mese');
+    const sel = document.getElementById('mese');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === m) { sel.selectedIndex = i; break; }
+    }
+  }
+  updatePunBadge();
+  setTimeout(() => {
+    calcola();
+    setTimeout(() => document.getElementById('result-wrap').scrollIntoView({behavior:'smooth'}), 300);
+  }, 150);
+})();
+</script>
+</body>
+</html>
