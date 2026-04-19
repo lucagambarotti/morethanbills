@@ -419,6 +419,7 @@ function appendMessage(role, text, id, typing = false) {
     .replace(/^## (.+)$/gm,'<strong>$1</strong>')
     .replace(/^# (.+)$/gm,'<strong>$1</strong>')
     .replace(/^- (.+)$/gm,'• $1')
+    .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--green);font-weight:600;text-decoration:underline">$1</a>')
     .replace(/\n/g,'<br>');
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
