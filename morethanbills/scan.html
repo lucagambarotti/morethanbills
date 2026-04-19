@@ -25,6 +25,32 @@ main{flex:1;max-width:680px;width:100%;margin:0 auto;padding:24px 16px 60px}
 .page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
 .page-sub{font-size:.88rem;color:var(--muted);margin-bottom:24px;line-height:1.5}
 
+/* CHAT */
+.chat-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;margin-bottom:14px}
+.chat-head{padding:12px 18px;background:var(--green);display:flex;align-items:center;gap:10px}
+.chat-head-title{font-size:.9rem;font-weight:800;color:#fff}
+.chat-head-sub{font-size:.72rem;color:rgba(255,255,255,.75);margin-top:1px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:240px;max-height:400px}
+.msg{max-width:88%;line-height:1.5;font-size:.85rem;padding:10px 14px;border-radius:12px}
+.msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:3px}
+.msg.ai{align-self:flex-start;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-bottom-left-radius:3px}
+.msg.ai.typing{opacity:.6}
+.msg-time{font-size:.65rem;opacity:.6;margin-top:4px;text-align:right}
+.chat-input-row{padding:12px;border-top:1px solid var(--rule);display:flex;gap:8px;background:var(--white)}
+.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--rule);border-radius:8px;font-family:'Figtree',sans-serif;font-size:.88rem;outline:none;resize:none;min-height:42px;max-height:100px;overflow-y:auto;transition:border .12s}
+.chat-input:focus{border-color:var(--green-md)}
+.btn-send{width:40px;height:40px;background:var(--green);border:none;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;align-self:flex-end}
+.btn-send:hover{background:var(--green-dk)}
+.btn-send:disabled{opacity:.4;cursor:not-allowed}
+.chat-suggestions{padding:10px 12px 10px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--hairline)}
+.sugg{padding:5px 10px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:20px;font-size:.75rem;font-weight:600;color:var(--green-dk);cursor:pointer;transition:background .12s;white-space:nowrap}
+.sugg:hover{background:var(--green-md);color:#fff}
+.divider{text-align:center;font-size:.72rem;color:var(--muted);padding:6px 0;letter-spacing:.3px}
+
+/* SEZIONE UPLOAD */
+.upload-section-title{font-size:1rem;font-weight:800;letter-spacing:-.2px;margin-bottom:6px;margin-top:8px;color:var(--ink)}
+.upload-section-sub{font-size:.85rem;color:var(--muted);margin-bottom:14px;line-height:1.5}
+
 /* UPLOAD CARD */
 .upload-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);padding:24px;margin-bottom:14px}
 .upload-zone{border:2px dashed var(--green-md);border-radius:8px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--green-lt)}
@@ -72,28 +98,6 @@ input[type=file]{display:none}
 .dati-val{font-size:.88rem;font-weight:700;color:var(--ink)}
 .btn-vai{width:calc(100% - 36px);margin:12px 18px;padding:13px;background:var(--green);border:none;border-radius:8px;color:#fff;font-family:'Figtree',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .12s}
 .btn-vai:hover{background:var(--green-dk)}
-
-/* CHAT */
-.chat-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
-.chat-head{padding:12px 18px;background:var(--green);display:flex;align-items:center;gap:10px}
-.chat-head-title{font-size:.9rem;font-weight:800;color:#fff}
-.chat-head-sub{font-size:.72rem;color:rgba(255,255,255,.75);margin-top:1px}
-.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:240px;max-height:400px}
-.msg{max-width:88%;line-height:1.5;font-size:.85rem;padding:10px 14px;border-radius:12px}
-.msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:3px}
-.msg.ai{align-self:flex-start;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-bottom-left-radius:3px}
-.msg.ai.typing{opacity:.6}
-.msg-time{font-size:.65rem;opacity:.6;margin-top:4px;text-align:right}
-.chat-input-row{padding:12px;border-top:1px solid var(--rule);display:flex;gap:8px;background:var(--white)}
-.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--rule);border-radius:8px;font-family:'Figtree',sans-serif;font-size:.88rem;outline:none;resize:none;min-height:42px;max-height:100px;overflow-y:auto;transition:border .12s}
-.chat-input:focus{border-color:var(--green-md)}
-.btn-send{width:40px;height:40px;background:var(--green);border:none;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;align-self:flex-end}
-.btn-send:hover{background:var(--green-dk)}
-.btn-send:disabled{opacity:.4;cursor:not-allowed}
-.chat-suggestions{padding:0 12px 10px;display:flex;gap:6px;flex-wrap:wrap}
-.sugg{padding:5px 10px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:20px;font-size:.75rem;font-weight:600;color:var(--green-dk);cursor:pointer;transition:background .12s;white-space:nowrap}
-.sugg:hover{background:var(--green-md);color:#fff}
-.divider{text-align:center;font-size:.72rem;color:var(--muted);padding:6px 0;letter-spacing:.3px}
 </style>
 </head>
 <body>
@@ -108,8 +112,42 @@ input[type=file]{display:none}
 
 <main>
   <div style="height:16px"></div>
-  <div class="page-title">Analizza la tua bolletta</div>
-  <div class="page-sub">Carica la tua bolletta in PDF o fotografala — l'AI estrae automaticamente tutti i dati e precompila il simulatore.</div>
+  <div class="page-title">Ciao! Sono MarzIA 🤖</div>
+  <div class="page-sub">Sono la tua consulente AI per le bollette elettriche. Chiedimi quello che vuoi, oppure carica la tua bolletta e la analizzo automaticamente.</div>
+
+  <!-- CHAT IN CIMA -->
+  <div class="chat-card" id="chat-card">
+    <div class="chat-head">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div>
+        <div class="chat-head-title">Consulente bolletta AI — MarzIA</div>
+        <div class="chat-head-sub">Fai qualsiasi domanda sulla tua bolletta o sull'offerta</div>
+      </div>
+    </div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <span class="sugg" onclick="askSuggestion(this)">Cosa è il PUN?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Cosa è l'ASOS?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Perché pago le perdite di rete?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Come funzionano le segnalazioni?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Conviene il fisso o il variabile?</span>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">
+        👋 Ciao! Sono MarzIA, la tua consulente per le bollette elettriche.<br><br>
+        Puoi chiedermi qualsiasi cosa: come funzionano i costi, cosa conviene, come risparmiare. Oppure carica la tua bolletta qui sotto e la analizzo per te!
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="Scrivi una domanda…" rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
+      <button class="btn-send" id="btn-send" onclick="sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SEZIONE UPLOAD -->
+  <div class="upload-section-title">📄 Hai la tua bolletta?</div>
+  <div class="upload-section-sub">Caricala in PDF o fotografala — l'AI estrae automaticamente tutti i dati e precompila il simulatore.</div>
 
   <!-- UPLOAD CARD -->
   <div class="upload-card">
@@ -177,35 +215,6 @@ input[type=file]{display:none}
     </button>
   </div>
 
-  <!-- CHAT CONSULENTE -->
-  <div class="chat-card" id="chat-card">
-    <div class="chat-head">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <div>
-        <div class="chat-head-title">Consulente bolletta AI</div>
-        <div class="chat-head-sub">Fai qualsiasi domanda sulla tua bolletta o sull'offerta</div>
-      </div>
-    </div>
-    <div class="chat-suggestions" id="chat-suggestions">
-      <span class="sugg" onclick="askSuggestion(this)">Cosa è il PUN?</span>
-      <span class="sugg" onclick="askSuggestion(this)">Cosa è l'ASOS?</span>
-      <span class="sugg" onclick="askSuggestion(this)">Perché pago le perdite di rete?</span>
-      <span class="sugg" onclick="askSuggestion(this)">Come funzionano le segnalazioni?</span>
-      <span class="sugg" onclick="askSuggestion(this)">Conviene il fisso o il variabile?</span>
-    </div>
-    <div class="chat-messages" id="chat-messages">
-      <div class="msg ai">
-        👋 Ciao! Sono il tuo consulente bolletta. Puoi chiedermi qualsiasi cosa sulla tua bolletta elettrica, sull'offerta o sui corrispettivi che paghi.<br><br>
-        Se hai caricato la tua bolletta qui sopra, posso rispondere in modo ancora più preciso basandomi sui tuoi dati reali.
-      </div>
-    </div>
-    <div class="chat-input-row">
-      <textarea class="chat-input" id="chat-input" placeholder="Scrivi una domanda…" rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
-      <button class="btn-send" id="btn-send" onclick="sendMessage()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-  </div>
 </main>
 
 <script>
@@ -239,7 +248,6 @@ function processFile(file) {
   document.getElementById('preview-wrap').style.display = 'block';
   document.getElementById('stato-wrap').style.display = 'none';
   document.getElementById('dati-card').style.display = 'none';
-  // Leggi come base64
   const reader = new FileReader();
   reader.onload = e => { fileBase64 = e.target.result.split(',')[1]; };
   reader.readAsDataURL(file);
@@ -264,7 +272,6 @@ async function analizzaBolletta() {
   document.getElementById('stato-err').style.display = 'none';
   document.getElementById('dati-card').style.display = 'none';
 
-  // Determina mediaType
   const mt = selectedFile.type || 'application/octet-stream';
   const mediaType = mt === 'application/pdf' ? 'application/pdf'
     : mt.startsWith('image/') ? mt : 'image/jpeg';
@@ -286,6 +293,8 @@ async function analizzaBolletta() {
     }
 
     datiEstratti = data.dati;
+    // Forza sempre tariffa variabile
+    datiEstratti.tipo = 'variabile';
     datiSimulatore = datiEstratti;
     document.getElementById('stato-ok').style.display = 'block';
     mostraDati(datiEstratti);
@@ -300,13 +309,12 @@ async function analizzaBolletta() {
 
 function mostraDati(d) {
   const nomi = {
-    mese:'Periodo', profilo:'Profilo', tipo:'Tariffa',
+    mese:'Periodo', profilo:'Profilo',
     kw:'Potenza (kW)', f1:'Consumi F1 (kWh)', f2:'Consumi F2 (kWh)', f3:'Consumi F3 (kWh)'
   };
   const formatta = (k, v) => {
     if (v === null || v === undefined) return '<span style="color:#bbb">Non rilevato</span>';
     if (k === 'profilo') return v === 'residente' ? 'Domestico Residente' : 'Domestico Non Residente';
-    if (k === 'tipo') return v === 'variabile' ? '⚡ Variabile' : '🔒 Fissa';
     return v;
   };
   const html = Object.entries(nomi).map(([k, label]) =>
@@ -329,7 +337,8 @@ function vaiAlSimulatore() {
   if (d.kw != null) params.set('kw', d.kw);
   if (d.mese) params.set('mese', d.mese);
   if (d.profilo) params.set('profilo', d.profilo);
-  if (d.tipo) params.set('tariffa', d.tipo);
+  // Forza sempre variabile
+  params.set('tariffa', 'variabile');
   window.location.href = 'index.html?' + params.toString();
 }
 
@@ -367,11 +376,9 @@ async function sendMessage() {
   input.value = '';
   input.style.height = 'auto';
 
-  // Mostra messaggio utente
   appendMessage('user', text);
   chatHistory.push({ role: 'user', content: text });
 
-  // Indicatore typing
   const typingId = 'typing-' + Date.now();
   appendMessage('ai', '…', typingId, true);
 
@@ -391,7 +398,6 @@ async function sendMessage() {
     appendMessage('ai', reply);
     chatHistory.push({ role: 'assistant', content: reply });
 
-    // Limita cronologia
     if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
   } catch {
     removeMessage(typingId);
@@ -405,25 +411,25 @@ function appendMessage(role, text, id, typing = false) {
   const div = document.createElement('div');
   div.className = 'msg ' + role + (typing ? ' typing' : '');
   if (id) div.id = id;
-  // Converti newline in <br>
   div.innerHTML = text
-  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-  .replace(/\*(.+?)\*/g,'<em>$1</em>')
-  .replace(/^### (.+)$/gm,'<strong>$1</strong>')
-  .replace(/^## (.+)$/gm,'<strong>$1</strong>')
-  .replace(/^# (.+)$/gm,'<strong>$1</strong>')
-  .replace(/^- (.+)$/gm,'• $1')
-  .replace(/\n/g,'<br>');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^## (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^# (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^- (.+)$/gm,'• $1')
+    .replace(/\n/g,'<br>');
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
+
 function removeMessage(id) {
   const el = document.getElementById(id);
   if (el) el.remove();
 }
 
-// ---- PRECOMPILA DA URL params (se arriva da simulatore) ----
+// ---- PRECOMPILA DA URL params ----
 window.addEventListener('load', () => {
   const p = new URLSearchParams(window.location.search);
   if (p.has('f1') || p.has('mese')) {
@@ -434,16 +440,19 @@ window.addEventListener('load', () => {
       kw: parseFloat(p.get('kw')) || 3,
       mese: p.get('mese') || '',
       profilo: p.get('profilo') || 'residente',
-      tariffa: p.get('tariffa') || 'variabile',
+      tariffa: 'variabile',
       totale: p.get('totale') || '',
       quarta: p.get('quarta') || '',
       pun: p.get('pun') || ''
     };
   }
-  updatePunBadge();
+  // Scroll automatico al chat se arriva da link #chat
+  if (window.location.hash === '#chat') {
+    document.getElementById('chat-card').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('chat-input').focus(), 500);
+  }
 });
 
-// Badge PUN (riusa logica da index.html se disponibile)
 function updatePunBadge() {}
 </script>
 </body>
