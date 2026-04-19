@@ -47,7 +47,7 @@ BONUS E SCONTI:
 - Bonus Nuovo Cliente: -10 euro/mese per le prime 3 bollette dopo l'attivazione
 - Bonus Porta un Amico: se segnali qualcuno, lui riceve -10 euro/mese sulle sue prime 3 bollette
 - Bonus Consumi: per ogni persona segnalata ricevi 0,01 euro/kWh sui suoi consumi (media 2,50 euro/mese per segnalato)
-- Con piu segnalazioni puoi arrivare ad azzerare completamente il costo dello spread
+- Con piu segnalazioni puoi anche arrivare ad azzerare completamente il costo dello spread
 
 COME USARE IL SIMULATORE:
 - Inserisci i kWh per fascia (F1, F2, F3), la potenza contrattuale e il mese
