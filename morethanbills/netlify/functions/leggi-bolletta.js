@@ -1,7 +1,3 @@
-// netlify/functions/leggi-bolletta.js
-// Riceve una bolletta (PDF o immagine) in base64 e la manda a Claude
-// per estrarre i dati e precompilare il simulatore
-
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -13,15 +9,10 @@ exports.handler = async (event) => {
   }
 
   let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Payload non valido' }) };
-  }
+  try { body = JSON.parse(event.body); }
+  catch { return { statusCode: 400, body: JSON.stringify({ error: 'Payload non valido' }) }; }
 
   const { fileData, mediaType } = body;
-  // mediaType: "application/pdf" | "image/jpeg" | "image/png" | "image/webp"
-
   if (!fileData || !mediaType) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Mancano fileData o mediaType' }) };
   }
@@ -31,7 +22,7 @@ Rispondi ESCLUSIVAMENTE con un oggetto JSON valido, senza testo aggiuntivo, senz
 
 Campi da estrarre:
 - f1: consumo in fascia F1 (kWh, numero intero)
-- f2: consumo in fascia F2 (kWh, numero intero)  
+- f2: consumo in fascia F2 (kWh, numero intero)
 - f3: consumo in fascia F3 (kWh, numero intero)
 - kw: potenza contrattuale (es. 3 o 4.5, numero decimale)
 - mese: periodo di fatturazione nel formato "Mese AAAA" (es. "Marzo 2026")
@@ -43,7 +34,6 @@ Se un dato non è leggibile metti null.
 Esempio di risposta corretta:
 {"f1":57,"f2":50,"f3":82,"kw":3,"mese":"Marzo 2026","profilo":"nonResidente","tipo":"variabile"}`;
 
-  // Costruisci il messaggio con il documento
   let contentBlock;
   if (mediaType === 'application/pdf') {
     contentBlock = {
@@ -66,7 +56,7 @@ Esempio di risposta corretta:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 256,
         messages: [{
           role: 'user',
@@ -75,18 +65,11 @@ Esempio di risposta corretta:
       })
     });
 
-    if (!response.ok) {
-      const err = await response.text();
-      return { statusCode: 502, body: JSON.stringify({ error: 'Errore API Claude', detail: err }) };
-    }
-
     const data = await response.json();
     const text = data.content?.[0]?.text || '';
 
-    // Parsing sicuro del JSON
     let parsed;
     try {
-      // Rimuove eventuale markdown
       const clean = text.replace(/```json|```/g, '').trim();
       parsed = JSON.parse(clean);
     } catch {
