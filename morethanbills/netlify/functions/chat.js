@@ -106,3 +106,7 @@ REGOLE IMPORTANTI:
   } catch (err) {
     return {
       statusCode: 500,
+      body: JSON.stringify({ error: 'Errore interno', detail: err.message })
+    };
+  }
+};
