@@ -406,7 +406,15 @@ function appendMessage(role, text, id, typing = false) {
   div.className = 'msg ' + role + (typing ? ' typing' : '');
   if (id) div.id = id;
   // Converti newline in <br>
-  div.innerHTML = text.replace(/\n/g, '<br>');
+  div.innerHTML = text
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+  .replace(/\*(.+?)\*/g,'<em>$1</em>')
+  .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+  .replace(/^## (.+)$/gm,'<strong>$1</strong>')
+  .replace(/^# (.+)$/gm,'<strong>$1</strong>')
+  .replace(/^- (.+)$/gm,'• $1')
+  .replace(/\n/g,'<br>');
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
