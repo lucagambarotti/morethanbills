@@ -1751,27 +1751,36 @@ function renderBrokerPanel() {
   );
 
   if (!isFissa) {
-    // Energia attiva (costo PUN)
+    // Energia attiva — PUN (su kfv)
+    const punSuKfv = r2(r.pun1k * r.kfv);
+    const spreadSuKfv = r2(C.spread * r.kfv);
     rowsME += bpRow(
-      'Energia attiva — costo PUN',
+      'Energia attiva — componente PUN (mercato)',
       'Indice di mercato',
       'arera',
-      `Costo dell'energia acquistata sul mercato elettrico (Borsa Elettrica). Il PUN (Prezzo Unico Nazionale) è il prezzo di riferimento mensile uguale per tutti i fornitori. Non dipende dal venditore ma dall'andamento del mercato energetico.`,
-      `PUN ${fe2(r.pun)} €/MWh ÷ 1000 = ${fe6(r.pun1k)} €/kWh<br>× ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r.mE)} €</span>`,
-      r.mE, false
+      `Costo dell'energia acquistata sul mercato elettrico (Borsa Elettrica). Il PUN è il Prezzo Unico Nazionale: cambia ogni mese ed è uguale per TUTTI i fornitori italiani. Si applica sui kWh fatturati comprensivi delle perdite di rete (kfv = kWh consumati + 10% perdite).`,
+      `PUN ${fe2(r.pun)} €/MWh ÷ 1000 = ${fe6(r.pun1k)} €/kWh<br>kfv = ${fe2(r.totalKwh)} kWh + ${fe2(r.loss)} kWh perdite = ${fe2(r.kfv)} kfv<br>${fe6(r.pun1k)} €/kWh × ${fe2(r.kfv)} kfv = <span class="formula-result">${fe2(punSuKfv)} €</span>`,
+      punSuKfv, false
     );
 
-    // Perdite di rete
+    // Spread commerciale — LA VOCE COMMERCIALE CHIAVE
     rowsME += bpRow(
-      'Perdite di rete',
-      'ARERA — uguale per tutti',
-      'arera',
-      `Energia dispersa durante il trasporto dalla centrale al punto di consegna. ARERA fissa convenzionalmente la percentuale al 10% per la Bassa Tensione. Tutti i clienti la pagano con qualsiasi fornitore — non è una voce commerciale.`,
-      `${fe2(r.totalKwh)} kWh × 10% = ${fe2(r.loss)} kWh perdite<br>${fe6(r.eu)} €/kWh × ${fe2(r.loss)} kWh = <span class="formula-result">${fe2(r.mP)} €</span>`,
-      r.mP, false
+      'Spread commerciale — quota energia',
+      'Commerciale',
+      'comm',
+      `Questa è la componente commerciale del venditore sul costo dell'energia. Si applica anch'essa sui kfv (kWh consumati + perdite). Lo spread netto è 0,034000 €/kWh. Equivale a 0,037400 €/kWh calcolato sui soli kWh consumati. È la principale voce differenziante tra fornitori — più basso è lo spread, meno si paga.`,
+      `Spread netto: 0,034000 €/kWh × ${fe2(r.kfv)} kfv = <span class="formula-result">${fe2(spreadSuKfv)} €</span><br>Spread lordo equiv. (su kWh consumati): 0,034000 × 1,10 = 0,037400 €/kWh`,
+      spreadSuKfv, false
     );
 
-    // Disp. variabile
+    // Nota perdite di rete (informativa)
+    rowsME += `<div class="bp-row" style="background:#fafaf8">
+      <div class="bp-row-top"><div class="bp-row-name">ℹ️ Perdite di rete — nota esplicativa<span class="bp-badge arera">ARERA — uguale per tutti</span></div><div class="bp-row-amount" style="color:var(--muted);font-size:.8rem">già incluse nel kfv</div></div>
+      <div class="bp-row-desc">Le perdite di rete (10% dei kWh consumati) non sono una voce separata in bolletta ma spiegano perché si paga su ${fe2(r.kfv)} kfv invece di ${fe2(r.totalKwh)} kWh. Tutti i clienti le pagano con qualsiasi fornitore — percentuale fissata da ARERA per la Bassa Tensione.</div>
+      <div class="bp-row-formula">${fe2(r.totalKwh)} kWh consumati × 10% = ${fe2(r.loss)} kWh perdite → kfv = ${fe2(r.kfv)} kWh fatturati (su cui si applicano PUN e spread)</div>
+    </div>`;
+
+        // Disp. variabile
     const kfvDesc = `kWh consumati (${fe2(r.totalKwh)}) + perdite (${fe2(r.loss)}) = ${fe2(r.kfv)} kfv`;
     rowsME += bpRow(
       'Dispacciamento — quota variabile',
@@ -1984,12 +1993,14 @@ function renderBrokerPanel() {
 
     <div class="bp-note">
       <strong>Formula media 12 mesi:</strong> (3 × ${fe2(r.totale)} + 9 × ${fe2(Q4r)}) ÷ 12 = <strong>${fe2(EQ12)} €/mese</strong><br>
-      I primi 3 mesi includono il Bonus Nuovo Cliente (−10€/mese). Dalla 4ª il prezzo risale di 10€. La media reale ponderata è ${fe2(EQ12)} €/mese.<br><br>
-      ${!isFissa ? `<strong>Struttura del costo per kWh:</strong><br>
-      PUN (mercato, variabile): ${fe2(r.pun)} €/MWh = ${(r.pun/1000).toFixed(4).replace('.',',')} €/kWh<br>
-      Spread commerciale (netto): 0,0340 €/kWh | Spread lordo (con perdite): 0,0374 €/kWh<br>
-      Perdite di rete 10%: applicate su ${fe2(r.totalKwh)} kWh → ${fe2(r.kfv)} kWh fatturati (kfv)` : ''}
-    </div>`;
+      I primi 3 mesi includono il Bonus Nuovo Cliente (−10€/mese). Dalla 4ª il prezzo risale di 10€.<br><br>
+      ${!isFissa ? `<strong>📊 Riepilogo voci COMMERCIALI vs ARERA:</strong><br>
+      🟡 COMMERCIALE — CCV (commercializzazione): ${fe2(r.mCF)} €<br>
+      🟡 COMMERCIALE — Spread: 0,034000 €/kWh × ${fe2(r.kfv)} kfv = <strong>${fe2(r2(C.spread*r.kfv))} €</strong><br>
+      🟡 COMMERCIALE — Bonus NC (sconto): −10,00 €<br>
+      <strong>Totale voci commerciali: ${fe2(r2(r.mCF + C.spread*r.kfv - 10))} € (prime 3 boll.) | ${fe2(r2(r.mCF + C.spread*r.kfv))} € dalla 4ª</strong><br><br>
+      🟢 Tutto il resto è UGUALE con qualsiasi fornitore (PUN, ARERA, imposte, canone).<br><br>
+      <em>PUN: ${fe2(r.pun)} €/MWh | Spread netto: 0,034000 €/kWh | Spread lordo equiv.: 0,037400 €/kWh | kfv: ${fe2(r.kfv)} kWh</em>` : `<strong>Tariffa FISSA — prezzo bloccato indipendentemente dal mercato.</strong><br>Unica voce commerciale: CCV ${fe2(r.mCF)} € + prezzo fisso energia.`}`;
 
   const panel = document.getElementById('broker-panel');
   panel.innerHTML = html;
