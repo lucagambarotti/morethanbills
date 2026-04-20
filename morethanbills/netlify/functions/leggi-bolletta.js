@@ -21,18 +21,21 @@ exports.handler = async (event) => {
 Rispondi ESCLUSIVAMENTE con un oggetto JSON valido, senza testo aggiuntivo, senza markdown, senza backtick.
 
 Campi da estrarre:
-- f1: consumo in fascia F1 (kWh, numero intero)
-- f2: consumo in fascia F2 (kWh, numero intero)
-- f3: consumo in fascia F3 (kWh, numero intero)
+- f1: consumo in fascia F1 (kWh, numero intero). ATTENZIONE: se la bolletta è bimestrale, estrai il totale F1 dell'intero bimestre (non dimezzarlo)
+- f2: consumo in fascia F2 (kWh, numero intero). ATTENZIONE: se la bolletta è bimestrale, estrai il totale F2 dell'intero bimestre
+- f3: consumo in fascia F3 (kWh, numero intero). ATTENZIONE: se la bolletta è bimestrale, estrai il totale F3 dell'intero bimestre. Nota: alcune bollette mostrano solo F1 e F23 (ore vuote) — in quel caso metti f2=0 e f3=valore F23
 - kw: potenza contrattuale (es. 3 o 4.5, numero decimale)
-- mese: periodo di fatturazione nel formato "Mese AAAA" (es. "Marzo 2026")
+- bimestrale: true se il periodo di fatturazione copre 2 mesi (bimestre), false se copre 1 mese
+- mese: se la bolletta è MENSILE, il mese nel formato "Mese AAAA" (es. "Marzo 2026"). Se bimestrale metti null.
+- bimestre: se la bolletta è BIMESTRALE, il bimestre nel formato "Mmm – Mmm AAAA" usando le abbreviazioni italiane (es. "Gen – Feb 2026", "Mar – Apr 2026", "Mag – Giu 2026", "Lug – Ago 2026", "Set – Ott 2026", "Nov – Dic 2026", "Dic 25 – Gen 26"). Se mensile metti null.
 - profilo: "residente" se DOMESTICO RESIDENTE, "nonResidente" se DOMESTICO NON RESIDENTE o D3
 - tipo: "variabile" se l'offerta è a prezzo variabile/PUN, "fissa" se a prezzo fisso
 
 Se un dato non è leggibile metti null.
 
-Esempio di risposta corretta:
-{"f1":57,"f2":50,"f3":82,"kw":3,"mese":"Marzo 2026","profilo":"nonResidente","tipo":"variabile"}`;
+Esempi di risposta corretta:
+Bolletta mensile: {"f1":57,"f2":50,"f3":82,"kw":3,"bimestrale":false,"mese":"Marzo 2026","bimestre":null,"profilo":"residente","tipo":"variabile"}
+Bolletta bimestrale: {"f1":414,"f2":291,"f3":556,"kw":3,"bimestrale":true,"mese":null,"bimestre":"Gen – Feb 2026","profilo":"residente","tipo":"variabile"}`;
 
   let contentBlock;
   if (mediaType === 'application/pdf') {
@@ -57,7 +60,7 @@ Esempio di risposta corretta:
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 256,
+        max_tokens: 300,
         messages: [{
           role: 'user',
           content: [contentBlock, { type: 'text', text: prompt }]
