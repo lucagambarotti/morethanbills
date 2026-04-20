@@ -333,6 +333,19 @@ function mostraDati(d) {
     </div>`
   ).join('');
   document.getElementById('dati-grid').innerHTML = html;
+  // Nota bimestrale
+  const nota = document.getElementById('dati-nota-bim');
+  if (d.bimestrale) {
+    if (!nota) {
+      const n = document.createElement('div');
+      n.id = 'dati-nota-bim';
+      n.style.cssText = 'padding:10px 18px;font-size:.78rem;color:#7A6000;background:#FFFBEB;border-top:1px solid #F0D060;';
+      n.innerHTML = '📅 Bolletta bimestrale rilevata — i kWh inseriti sono il totale dei 2 mesi. Il simulatore mostrerà il <strong>totale bimestrale</strong> con PUN medio dei 2 mesi.';
+      document.getElementById('dati-grid').after(n);
+    }
+  } else if (nota) {
+    nota.remove();
+  }
   document.getElementById('dati-card').style.display = 'block';
 }
 

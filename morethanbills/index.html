@@ -1556,7 +1556,18 @@ updatePunBadge();
   if (p.has('kw')) document.getElementById('kw').value = p.get('kw');
   if (p.has('profilo')) document.getElementById('profilo').value = p.get('profilo');
   if (p.has('tariffa')) { document.getElementById('tariffa-tipo').value = p.get('tariffa'); onTariffaTipoChange(); }
-  if (p.has('mese')) {
+  // Gestione bimestrale vs mensile
+  if (p.has('tipo') && p.get('tipo') === 'bimestrale') {
+    document.querySelector('input[name=tipo][value="bimestrale"]').checked = true;
+    toggleTipo();
+    if (p.has('bimestre')) {
+      const b = p.get('bimestre');
+      const sel = document.getElementById('bimestre');
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === b) { sel.selectedIndex = i; break; }
+      }
+    }
+  } else if (p.has('mese')) {
     const m = p.get('mese');
     const sel = document.getElementById('mese');
     for (let i = 0; i < sel.options.length; i++) {
