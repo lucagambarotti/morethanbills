@@ -292,6 +292,52 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--green-bd);
 .tariffa-reco{margin:0 18px 16px;padding:12px 14px;background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:8px;font-size:.82rem;color:var(--green-dk);font-weight:600;line-height:1.5}
 .tariffa-warn{margin:0 18px 16px;padding:12px 14px;background:var(--yellow-bg);border:1.5px solid var(--yellow-bd);border-radius:8px;font-size:.82rem;color:#7A6000;font-weight:600;line-height:1.5}
 
+/* ---- BROKER LOCK BUTTON ---- */
+.broker-lock-wrap{display:flex;justify-content:center;margin:18px 0 4px}
+.btn-broker-lock{display:flex;align-items:center;gap:7px;padding:7px 16px;background:transparent;border:1.5px solid var(--rule);border-radius:20px;font-family:'Figtree',sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.btn-broker-lock:hover{border-color:var(--green-bd);color:var(--green-dk);background:var(--green-lt)}
+/* ---- BROKER MODAL ---- */
+.broker-modal{position:fixed;inset:0;background:rgba(20,30,22,.7);backdrop-filter:blur(4px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
+.broker-modal.open{display:flex}
+.broker-box{background:#fff;border-radius:12px;padding:28px 28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.broker-box h3{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.broker-box p{font-size:.82rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.broker-pwd-row{display:flex;gap:8px}
+.broker-pwd-row input{flex:1;padding:9px 12px;border:1.5px solid var(--rule);border-radius:7px;font-family:'Figtree',sans-serif;font-size:.9rem;outline:none}
+.broker-pwd-row input:focus{border-color:var(--green-bd)}
+.btn-broker-ok{padding:9px 18px;background:var(--green);border:none;border-radius:7px;color:#fff;font-family:'Figtree',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer}
+.broker-err{font-size:.78rem;color:#DC2626;margin-top:8px;display:none}
+/* ---- BROKER PANEL ---- */
+#broker-panel{display:none;margin-bottom:14px}
+#broker-panel.vis{display:block;animation:fu .3s ease}
+.bp-header{background:linear-gradient(135deg,#1C2B20,#2D7A4F);border-radius:10px;padding:18px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.bp-header-title{color:#fff;font-size:1rem;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:10px}
+.bp-header-sub{color:rgba(255,255,255,.6);font-size:.75rem;margin-top:3px}
+.btn-bp-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;color:#fff;font-size:.8rem;font-weight:700;padding:5px 12px;cursor:pointer;font-family:'Figtree',sans-serif}
+.bp-section{background:#fff;border:1px solid var(--rule);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.bp-section-head{padding:9px 16px;display:flex;align-items:center;gap:9px;background:var(--bg);border-bottom:1px solid var(--hairline)}
+.bp-section-title{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--ink)}
+.bp-section-total{margin-left:auto;font-size:.82rem;font-weight:800;color:var(--green)}
+.bp-row{padding:11px 16px;border-bottom:1px solid var(--hairline)}
+.bp-row:last-child{border-bottom:none}
+.bp-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:5px}
+.bp-row-name{font-size:.88rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bp-row-amount{font-size:.95rem;font-weight:800;color:var(--ink);flex-shrink:0;font-variant-numeric:tabular-nums}
+.bp-badge{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;text-transform:uppercase}
+.bp-badge.arera{background:#EBF5EE;color:#1F5C3A;border:1px solid var(--green-md)}
+.bp-badge.comm{background:var(--yellow-bg);color:#7A6000;border:1px solid var(--yellow-bd)}
+.bp-badge.bonus{background:#EBF5EE;color:#1F5C3A;border:1px solid var(--green-md)}
+.bp-row-desc{font-size:.75rem;color:var(--muted);line-height:1.5;margin-bottom:5px}
+.bp-row-formula{font-size:.73rem;font-family:monospace;background:#F4F5F0;border:1px solid var(--hairline);border-radius:5px;padding:5px 9px;color:#374140;line-height:1.6}
+.bp-total-section{background:var(--green-lt);border:1.5px solid var(--green-md);border-radius:10px;padding:14px 18px;margin-bottom:8px}
+.bp-total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--green-md)}
+.bp-total-row:last-child{border-bottom:none}
+.bp-total-label{font-size:.82rem;color:var(--green-dk);font-weight:600}
+.bp-total-val{font-size:.88rem;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+.bp-total-row.big .bp-total-label{font-size:.9rem;font-weight:800;color:var(--green-dk)}
+.bp-total-row.big .bp-total-val{font-size:1.2rem;color:var(--green)}
+.bp-note{font-size:.72rem;color:var(--muted);background:var(--bg);border:1px solid var(--hairline);border-radius:8px;padding:10px 14px;line-height:1.6;margin-bottom:8px}
+
 /* ---- SCONTRINO ENERGIA ---- */
 .scontrino-wrap{background:#fffef5;border-bottom:2px solid #F0B800;padding:0 0 2px}
 .scontrino-title{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#888;padding:10px 16px 4px;border-top:1px solid #eee}
@@ -474,8 +520,37 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--green-bd);
 
     <!-- 6. DETTAGLIO MATERIA ENERGIA -->
     <div class="rblock" id="res-det"></div>
+
+    <!-- BROKER LOCK -->
+    <div class="broker-lock-wrap" id="broker-lock-wrap" style="display:none">
+      <button class="btn-broker-lock" onclick="openBrokerModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Area riservata broker
+      </button>
+    </div>
+
+    <!-- BROKER PANEL -->
+    <div id="broker-panel"></div>
+
   </div>
 </main>
+
+<!-- BROKER MODAL PASSWORD -->
+<div class="broker-modal" id="broker-modal">
+  <div class="broker-box">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Area Broker
+    </h3>
+    <p>Inserisci la password per accedere al pannello di dettaglio tecnico dei calcoli.</p>
+    <div class="broker-pwd-row">
+      <input type="password" id="broker-pwd" placeholder="Password…" onkeydown="if(event.key==='Enter')checkBrokerPwd()">
+      <button class="btn-broker-ok" onclick="checkBrokerPwd()">Accedi</button>
+    </div>
+    <div class="broker-err" id="broker-err">Password errata. Riprova.</div>
+    <div style="margin-top:14px;text-align:right"><button onclick="closeBrokerModal()" style="background:none;border:none;font-family:Figtree,sans-serif;font-size:.8rem;color:var(--muted);cursor:pointer">Annulla</button></div>
+  </div>
+</div>
 
 <!-- MODAL BOLLETTA -->
 <div class="modal-overlay" id="modal-bolletta" onclick="handleOverlayClick(event)">
@@ -820,6 +895,9 @@ function calcola(){
       document.getElementById('res-tariffa').style.display='block';
     }
     document.getElementById("result-wrap").classList.add("vis");
+    document.getElementById("broker-lock-wrap").style.display = "flex";
+    const bp = document.getElementById("broker-panel"); if(bp) { bp.classList.remove("vis"); bp.innerHTML=""; }
+    brokerUnlocked = false;
     renderFields(); updatePunBadge();
   }catch(e){eb.textContent="⚠ "+e.message;eb.classList.add("vis");}
 }
@@ -1580,6 +1658,354 @@ updatePunBadge();
     setTimeout(() => document.getElementById('result-wrap').scrollIntoView({behavior:'smooth'}), 300);
   }, 150);
 })();
+
+/* ============================================================  BROKER PANEL  */
+const BROKER_PWD = 'password';
+let brokerUnlocked = false;
+
+function openBrokerModal() {
+  document.getElementById('broker-modal').classList.add('open');
+  document.getElementById('broker-pwd').value = '';
+  document.getElementById('broker-err').style.display = 'none';
+  setTimeout(() => document.getElementById('broker-pwd').focus(), 100);
+}
+function closeBrokerModal() {
+  document.getElementById('broker-modal').classList.remove('open');
+}
+function checkBrokerPwd() {
+  const val = document.getElementById('broker-pwd').value.trim();
+  if (val === BROKER_PWD) {
+    brokerUnlocked = true;
+    closeBrokerModal();
+    renderBrokerPanel();
+  } else {
+    document.getElementById('broker-err').style.display = 'block';
+  }
+}
+
+function renderBrokerPanel() {
+  if (!lastResult || !brokerUnlocked) return;
+  const r = lastResult;
+  const isFissa = r.tariffaTipo === 'mono' || r.tariffaTipo === 'multi';
+  const fe2 = v => new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+  const fe4 = v => v.toFixed(4).replace('.',',');
+  const fe6 = v => v.toFixed(6).replace('.',',');
+  const pct = v => (v*100).toFixed(1).replace('.',',')+'%';
+
+  function bpRow(name, badge, badgeClass, desc, formula, amount, isNeg) {
+    const color = isNeg ? 'color:#1F5C3A' : '';
+    return `<div class="bp-row">
+      <div class="bp-row-top">
+        <div class="bp-row-name">
+          ${name}
+          <span class="bp-badge ${badgeClass}">${badge}</span>
+        </div>
+        <div class="bp-row-amount" style="${color}">${isNeg?'−':'+'}${fe2(Math.abs(amount))} €</div>
+      </div>
+      <div class="bp-row-desc">${desc}</div>
+      <div class="bp-row-formula">${formula}</div>
+    </div>`;
+  }
+
+  // ---- SEZIONE 1: MATERIA ENERGIA ----
+  let rowsME = '';
+
+  // Disp. Terna fisso
+  rowsME += bpRow(
+    'Dispacciamento Terna — quota fissa',
+    'ARERA — uguale per tutti',
+    'arera',
+    "Corrispettivo fisso mensile per il servizio che garantisce l'equilibrio tra energia immessa e prelevata dalla rete in ogni istante della giornata. Definito da ARERA, è identico per tutti i fornitori.",
+    `0,007000 €/anno ÷ 12 = <span class="formula-result">${fe2(r.mDF)} €</span>`,
+    r.mDF, false
+  );
+
+  // DispBT
+  rowsME += bpRow(
+    'Corrispettivo DispBT — quota fissa',
+    'ARERA — uguale per tutti',
+    'arera',
+    'Corrispettivo fisso mensile che compensa la differenza tra i costi di gestione commerciale riconosciuti e quelli effettivamente sostenuti. Stabilito da ARERA.',
+    `0,102592 €/mese fisso = <span class="formula-result">${fe2(r.mDB)} €</span>`,
+    r.mDB, false
+  );
+
+  // CCV
+  rowsME += bpRow(
+    'Corrispettivi Commercializzazione (CCV)',
+    'Commerciale',
+    'comm',
+    'Costo fisso mensile per le attività di gestione commerciale del cliente (contratto, fatturazione, assistenza). È una componente del venditore, può variare tra fornitori.',
+    `11,6100 €/mese fisso = <span class="formula-result">${fe2(r.mCF)} €</span>`,
+    r.mCF, false
+  );
+
+  // Bonus NC
+  rowsME += bpRow(
+    'Bonus Nuovo Cliente — sconto prime 3 bollette',
+    'Commerciale',
+    'bonus',
+    'Sconto riconosciuto nelle prime 3 bollette a tutti i nuovi clienti. Non abbatte il Canone RAI. A partire dalla 4ª bolletta questo sconto non è più presente.',
+    `Sconto fisso = <span class="formula-result">−${fe2(Math.abs(r.mPF))} €</span> (prime 3 bollette)`,
+    Math.abs(r.mPF), true
+  );
+
+  if (!isFissa) {
+    // Energia attiva (costo PUN)
+    rowsME += bpRow(
+      'Energia attiva — costo PUN',
+      'Indice di mercato',
+      'arera',
+      `Costo dell'energia acquistata sul mercato elettrico (Borsa Elettrica). Il PUN (Prezzo Unico Nazionale) è il prezzo di riferimento mensile uguale per tutti i fornitori. Non dipende dal venditore ma dall'andamento del mercato energetico.`,
+      `PUN ${fe2(r.pun)} €/MWh ÷ 1000 = ${fe6(r.pun1k)} €/kWh<br>× ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r.mE)} €</span>`,
+      r.mE, false
+    );
+
+    // Perdite di rete
+    rowsME += bpRow(
+      'Perdite di rete',
+      'ARERA — uguale per tutti',
+      'arera',
+      `Energia dispersa durante il trasporto dalla centrale al punto di consegna. ARERA fissa convenzionalmente la percentuale al 10% per la Bassa Tensione. Tutti i clienti la pagano con qualsiasi fornitore — non è una voce commerciale.`,
+      `${fe2(r.totalKwh)} kWh × 10% = ${fe2(r.loss)} kWh perdite<br>${fe6(r.eu)} €/kWh × ${fe2(r.loss)} kWh = <span class="formula-result">${fe2(r.mP)} €</span>`,
+      r.mP, false
+    );
+
+    // Disp. variabile
+    const kfvDesc = `kWh consumati (${fe2(r.totalKwh)}) + perdite (${fe2(r.loss)}) = ${fe2(r.kfv)} kfv`;
+    rowsME += bpRow(
+      'Dispacciamento — quota variabile',
+      'ARERA — uguale per tutti',
+      'arera',
+      'Quota variabile del dispacciamento, proporzionale ai kWh fatturati comprensivi delle perdite di rete (kfv). Include il corrispettivo mercato capacità. Definita da ARERA ogni trimestre.',
+      `${kfvDesc}<br>${fe4(r.dispVar)} €/kWh × ${fe2(r.kfv)} kfv = <span class="formula-result">${fe2(r.mDV)} €</span>`,
+      r.mDV, false
+    );
+  } else {
+    // Tariffa fissa
+    const prezzoLabel = r.tariffaTipo === 'mono'
+      ? `Prezzo monorario: 0,1991 €/kWh (perdite già incluse nel prezzo)`
+      : `Prezzi multiorari: F1 0,2112 / F2 0,2013 / F3 0,1936 €/kWh (perdite incluse)`;
+    rowsME += bpRow(
+      'Energia attiva + Perdite di rete (prezzo fisso)',
+      'Commerciale',
+      'comm',
+      `Tariffa a prezzo bloccato. Il costo delle perdite di rete è già incluso nel prezzo fisso contrattuale — non compare come voce separata. ${prezzoLabel}`,
+      r.tariffaTipo === 'mono'
+        ? `0,1991 €/kWh × ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r.mE)} €</span>`
+        : `F1: 0,2112 × ${fe2(r.f1)} + F2: 0,2013 × ${fe2(r.f2)} + F3: 0,1936 × ${fe2(r.f3)} = <span class="formula-result">${fe2(r.mE)} €</span>`,
+      r.mE, false
+    );
+    // Disp. variabile per fissa (su kfv)
+    rowsME += bpRow(
+      'Dispacciamento — quota variabile',
+      'ARERA — uguale per tutti',
+      'arera',
+      "Anche con tariffa fissa il dispacciamento variabile si applica sui kWh fatturati con perdite (kfv). È una componente ARERA che non dipende dal prezzo dell'energia.",
+      `${fe2(r.totalKwh)} kWh × 1,10 = ${fe2(r.kfv)} kfv<br>${fe4(r.dispVar)} €/kWh × ${fe2(r.kfv)} kfv = <span class="formula-result">${fe2(r.mDV)} €</span>`,
+      r.mDV, false
+    );
+  }
+
+  // ---- SEZIONE 2: TRASPORTO ----
+  let rowsTR = '';
+  rowsTR += bpRow(
+    'Trasporto — quota fissa (σ1)',
+    'ARERA — uguale per tutti',
+    'arera',
+    "Quota fissa mensile per il servizio di trasporto e distribuzione dell'energia sulla rete. Copre i costi fissi di distribuzione e misura indipendentemente dai consumi. Uguale per tutti i fornitori sulla stessa rete.",
+    `${fe2(r.traspFisso)} €/mese fisso = <span class="formula-result">${fe2(r.traspFisso)} €</span>`,
+    r.traspFisso, false
+  );
+  rowsTR += bpRow(
+    'Trasporto — quota potenza (σ2)',
+    'ARERA — uguale per tutti',
+    'arera',
+    'Quota proporzionale alla potenza contrattualmente impegnata. Copre i costi di distribuzione legati alla capacità resa disponibile. Più alta la potenza, più alta questa quota.',
+    `${fe4(r.traspPot)} €/kW/mese × ${r.kw} kW = <span class="formula-result">${fe2(r.traspPotTot)} €</span>`,
+    r.traspPotTot, false
+  );
+  rowsTR += bpRow(
+    'Trasporto — quota variabile (σ3 + UC3 + UC6)',
+    'ARERA — uguale per tutti',
+    'arera',
+    'Quota proporzionale ai kWh consumati. Copre i costi variabili di trasmissione, distribuzione e meccanismi di perequazione. Si applica ai soli kWh consumati (non ai kfv).',
+    `${fe4(r.traspVar)} €/kWh × ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r.traspVarTot)} €</span>`,
+    r.traspVarTot, false
+  );
+
+  // ---- SEZIONE 3: ONERI DI SISTEMA ----
+  let rowsON = '';
+  if (r.asosFissoNR > 0) {
+    rowsON += bpRow(
+      'ASOS — quota fissa (solo non residenti)',
+      'ARERA — uguale per tutti',
+      'arera',
+      'Quota fissa mensile degli oneri di sistema applicata solo ai clienti domestici NON residenti (classe D3). Per i residenti questa quota è azzerata per legge.',
+      `7,3960 €/PdP/mese = <span class="formula-result">${fe2(r.asosFissoNR)} €</span>`,
+      r.asosFissoNR, false
+    );
+  }
+  rowsON += bpRow(
+    'ASOS — quota variabile',
+    'ARERA — uguale per tutti',
+    'arera',
+    'Oneri per il sostegno delle energie rinnovabili e della cogenerazione (CIP 6/92). Finanzia incentivi agli impianti da fonti rinnovabili. Pagato da tutti i clienti con qualsiasi fornitore.',
+    `${fe4(r.asos)} €/kWh × ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r2(r.asos*r.totalKwh))} €</span>`,
+    r2(r.asos*r.totalKwh), false
+  );
+  rowsON += bpRow(
+    'ARIM — quota variabile',
+    'ARERA — uguale per tutti',
+    'arera',
+    'Rimanenti oneri generali di sistema: includono incentivi per efficienza energetica, messa in sicurezza nucleare, agevolazioni ferroviarie, bonus sociale, integrazioni imprese elettriche minori.',
+    `${fe4(r.arim)} €/kWh × ${fe2(r.totalKwh)} kWh = <span class="formula-result">${fe2(r2(r.arim*r.totalKwh))} €</span>`,
+    r2(r.arim*r.totalKwh), false
+  );
+
+  // ---- SEZIONE 4: IMPOSTE ----
+  let rowsIMP = '';
+  if (r.txKwh > 0) {
+    const franchigia = r.totalKwh - r.txKwh;
+    const franchigiaNote = r.profilo === 'residente' && r.kw <= 3
+      ? `Residente ≤3kW: franchigia di ${fe2(franchigia)} kWh non tassati → ${fe2(r.txKwh)} kWh tassabili`
+      : `Tutti i kWh tassabili (non residente o potenza >3kW)`;
+    rowsIMP += bpRow(
+      'Accisa — imposta erariale sui consumi',
+      'Imposta di Stato',
+      'arera',
+      `Imposta sul consumo di energia elettrica. I clienti domestici residenti con potenza ≤3kW godono di una franchigia: i primi kWh mensili sono esenti. Uguale per tutti i fornitori — è un'imposta di legge.`,
+      `${franchigiaNote}<br>0,022700 €/kWh × ${fe2(r.txKwh)} kWh = <span class="formula-result">${fe2(r.imposte)} €</span>`,
+      r.imposte, false
+    );
+  } else {
+    rowsIMP += `<div class="bp-row"><div class="bp-row-desc" style="padding:4px 0">✅ Nessuna accisa — consumo entro la franchigia per residente ≤3kW</div></div>`;
+  }
+
+  const impon = r.impon || r2(r.materiaEnergia + r.trasporto + r.oneri + r.imposte);
+  rowsIMP += bpRow(
+    'IVA 10%',
+    'Imposta di Stato',
+    'arera',
+    "Imposta sul valore aggiunto al 10% applicata all'imponibile totale (materia energia + trasporto + oneri + accisa). Per utenze domestiche l'aliquota è sempre 10%, uguale per tutti i fornitori.",
+    `Imponibile totale ${fe2(impon)} € × 10% = <span class="formula-result">${fe2(r.iva)} €</span>`,
+    r.iva, false
+  );
+
+  // Canone RAI
+  let canoneHTML = '';
+  if (r.canone > 0) {
+    canoneHTML = `<div class="bp-section">
+      <div class="bp-section-head">
+        <span style="font-size:1rem">📺</span>
+        <span class="bp-section-title">Canone RAI</span>
+        <span class="bp-section-total">${fe2(r.canone)} €</span>
+      </div>
+      ${bpRow(
+        'Canone abbonamento televisivo',
+        'Imposta di Stato',
+        'arera',
+        'Riscosso tramite bolletta elettrica per legge (dal 2016). Addebitato solo ai clienti domestici residenti in 10 rate mensili (gennaio–ottobre). Non è abbattibile da sconti commerciali.',
+        `9,00 €/mese × 1 = <span class="formula-result">${fe2(r.canone)} €</span> — non soggetto a sconti`,
+        r.canone, false
+      )}
+    </div>`;
+  }
+
+  // Totale riepilogo
+  const Q4r = r.totaleDallaQuarta;
+  const EQ12 = r.totaleEq12;
+
+  const html = `
+    <div class="bp-header">
+      <div>
+        <div class="bp-header-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Pannello Broker — Dettaglio Calcoli
+        </div>
+        <div class="bp-header-sub">${r.periodoLabel} · ${r.profilo==='residente'?'Residente':'Non residente'} · ${r.kw} kW · ${r.totalKwh} kWh/mese · Tariffa ${isFissa?'Fissa':'Variabile'}</div>
+      </div>
+      <button class="btn-bp-close" onclick="closeBrokerPanel()">✕ Chiudi</button>
+    </div>
+
+    <div class="bp-note">
+      <strong>Come usare questo pannello:</strong> Mostra il dettaglio tecnico di ogni voce per rispondere con precisione alle obiezioni dei clienti.
+      Le voci con badge verde <span class="bp-badge arera" style="font-size:.6rem">ARERA — uguale per tutti</span> sono identiche con qualsiasi fornitore per legge.
+      Le voci con badge giallo <span class="bp-badge comm" style="font-size:.6rem">Commerciale</span> dipendono dal venditore.
+    </div>
+
+    <div class="bp-section">
+      <div class="bp-section-head">
+        <span style="font-size:1rem">⚡</span>
+        <span class="bp-section-title">1 · Spesa materia energia</span>
+        <span class="bp-section-total">${fe2(r.materiaEnergia)} €</span>
+      </div>
+      ${rowsME}
+    </div>
+
+    <div class="bp-section">
+      <div class="bp-section-head">
+        <span style="font-size:1rem">🔌</span>
+        <span class="bp-section-title">2 · Trasporto e gestione contatore</span>
+        <span class="bp-section-total">${fe2(r.trasporto)} €</span>
+      </div>
+      ${rowsTR}
+    </div>
+
+    <div class="bp-section">
+      <div class="bp-section-head">
+        <span style="font-size:1rem">🌿</span>
+        <span class="bp-section-title">3 · Oneri di sistema</span>
+        <span class="bp-section-total">${fe2(r.oneri)} €</span>
+      </div>
+      ${rowsON}
+    </div>
+
+    <div class="bp-section">
+      <div class="bp-section-head">
+        <span style="font-size:1rem">🏛️</span>
+        <span class="bp-section-title">4 · Imposte e IVA</span>
+        <span class="bp-section-total">${fe2(r.imposte + r.iva)} €</span>
+      </div>
+      ${rowsIMP}
+    </div>
+
+    ${canoneHTML}
+
+    <div class="bp-total-section">
+      <div class="bp-total-row"><span class="bp-total-label">Totale imponibile</span><span class="bp-total-val">${fe2(impon)} €</span></div>
+      <div class="bp-total-row"><span class="bp-total-label">IVA 10%</span><span class="bp-total-val">${fe2(r.iva)} €</span></div>
+      <div class="bp-total-row"><span class="bp-total-label">Totale bolletta</span><span class="bp-total-val">${fe2(r2(impon + r.iva))} €</span></div>
+      ${r.canone > 0 ? `<div class="bp-total-row"><span class="bp-total-label">+ Canone RAI</span><span class="bp-total-val">${fe2(r.canone)} €</span></div>` : ''}
+      <div class="bp-total-row big"><span class="bp-total-label">✅ TOTALE FORNITURA (1ª–3ª bolletta)</span><span class="bp-total-val">${fe2(r.totale)} €</span></div>
+      <div class="bp-total-row"><span class="bp-total-label">Dalla 4ª bolletta (senza Bonus NC)</span><span class="bp-total-val">${fe2(Q4r)} €</span></div>
+      <div class="bp-total-row"><span class="bp-total-label">Media 12 mesi reale (3×prima + 9×quarta ÷ 12)</span><span class="bp-total-val">${fe2(EQ12)} €</span></div>
+    </div>
+
+    <div class="bp-note">
+      <strong>Formula media 12 mesi:</strong> (3 × ${fe2(r.totale)} + 9 × ${fe2(Q4r)}) ÷ 12 = <strong>${fe2(EQ12)} €/mese</strong><br>
+      I primi 3 mesi includono il Bonus Nuovo Cliente (−10€/mese). Dalla 4ª il prezzo risale di 10€. La media reale ponderata è ${fe2(EQ12)} €/mese.<br><br>
+      ${!isFissa ? `<strong>Struttura del costo per kWh:</strong><br>
+      PUN (mercato, variabile): ${fe2(r.pun)} €/MWh = ${(r.pun/1000).toFixed(4).replace('.',',')} €/kWh<br>
+      Spread commerciale (netto): 0,0340 €/kWh | Spread lordo (con perdite): 0,0374 €/kWh<br>
+      Perdite di rete 10%: applicate su ${fe2(r.totalKwh)} kWh → ${fe2(r.kfv)} kWh fatturati (kfv)` : ''}
+    </div>`;
+
+  const panel = document.getElementById('broker-panel');
+  panel.innerHTML = html;
+  panel.classList.add('vis');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeBrokerPanel() {
+  const panel = document.getElementById('broker-panel');
+  panel.classList.remove('vis');
+  brokerUnlocked = false;
+}
+
+// Mostra il lucchetto quando c'è un risultato
+const origRenderAll = renderAll;
+
 </script>
 </body>
 </html>
