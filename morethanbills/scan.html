@@ -309,8 +309,17 @@ async function analizzaBolletta() {
 
 function mostraDati(d) {
   const nomi = {
-    mese:'Periodo', profilo:'Profilo',
+    periodo:'Periodo', profilo:'Profilo',
     kw:'Potenza (kW)', f1:'Consumi F1 (kWh)', f2:'Consumi F2 (kWh)', f3:'Consumi F3 (kWh)'
+  };
+  // Costruisci oggetto da mostrare
+  const display = {
+    periodo: d.bimestrale ? (d.bimestre || 'Bimestrale') + ' (bimestrale)' : (d.mese || '—'),
+    profilo: d.profilo,
+    kw: d.kw,
+    f1: d.f1,
+    f2: d.f2,
+    f3: d.f3
   };
   const formatta = (k, v) => {
     if (v === null || v === undefined) return '<span style="color:#bbb">Non rilevato</span>';
@@ -320,7 +329,7 @@ function mostraDati(d) {
   const html = Object.entries(nomi).map(([k, label]) =>
     `<div class="dati-row">
       <span class="dati-label">${label}</span>
-      <span class="dati-val">${formatta(k, d[k])}</span>
+      <span class="dati-val">${formatta(k, display[k])}</span>
     </div>`
   ).join('');
   document.getElementById('dati-grid').innerHTML = html;
@@ -335,10 +344,17 @@ function vaiAlSimulatore() {
   if (d.f2 != null) params.set('f2', d.f2);
   if (d.f3 != null) params.set('f3', d.f3);
   if (d.kw != null) params.set('kw', d.kw);
-  if (d.mese) params.set('mese', d.mese);
   if (d.profilo) params.set('profilo', d.profilo);
   // Forza sempre variabile
   params.set('tariffa', 'variabile');
+  // Gestione bimestrale
+  if (d.bimestrale && d.bimestre) {
+    params.set('tipo', 'bimestrale');
+    params.set('bimestre', d.bimestre);
+  } else {
+    params.set('tipo', 'mensile');
+    if (d.mese) params.set('mese', d.mese);
+  }
   window.location.href = 'index.html?' + params.toString();
 }
 
