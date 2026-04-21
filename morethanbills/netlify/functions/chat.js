@@ -42,11 +42,9 @@ Sono disponibili due tipi di tariffa:
 2. TARIFFA FISSA (prezzi bloccati):
    - Monoraria: 0,1991 euro/kWh su tutte le fasce (perdite gia incluse)
    - Multioraria: F1 = 0,2112 / F2 = 0,2013 / F3 = 0,1936 euro/kWh
-   - IMPORTANTE: quando spieghi la tariffa fissa devi sempre dire esplicitamente questa frase: "Come quasi tutti i fornitori, anche noi blocchiamo il prezzo per 12 mesi dall attivazione della fornitura."
-   - Poi aggiungi subito dopo: "La differenza e che da noi, a differenza di molti altri, puoi passare da fissa a variabile e viceversa in qualsiasi momento, senza aspettare la scadenza dei 12 mesi e senza penali."
-   - La differenza importante e che da noi puoi passare da tariffa fissa a variabile e viceversa in qualsiasi momento, senza aspettare la scadenza e senza penali
-   - Non sei prigioniero del contratto: se il PUN scende puoi passare a variabile e risparmiare, se il mercato sale torni a fisso e ti proteggi
-   - E il meglio dei due mondi: la certezza del prezzo fisso con la liberta di cambiare quando conviene
+   - IMPORTANTE: quando spieghi la tariffa fissa usa SEMPRE questa spiegazione precisa:
+     "Con la tariffa fissa il prezzo viene bloccato per un periodo di tempo, generalmente 12 mesi. Noi lo blocchiamo per 12 mesi per darti garanzie in caso di aumenti di prezzo. Tuttavia, se il mercato dovesse essere piu favorevole, non ti vincoliamo per tutti e 12 i mesi: puoi passare alla variabile in qualsiasi momento, cosa che generalmente altri fornitori non permettono."
+   - Questa e la differenza chiave da sottolineare sempre quando si parla di tariffa fissa
    - Conveniente quando il PUN e alto o si vuole certezza di spesa
 
 COME SI CALCOLA LA BOLLETTA:
