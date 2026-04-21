@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>More Than Bills — Carica la tua bolletta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#2D7A4F;--green-dk:#1F5C3A;--green-lt:#EBF5EE;--green-md:#A8D5B5;--green-bd:#C3E6CB;
+  --yellow:#F0B800;--yellow-bg:#FFFBEB;--yellow-bd:#F0D060;
+  --ink:#1a1a1a;--ink2:#333;--muted:#888;--bg:#F7F6F3;--white:#fff;
+  --rule:#E5E3DC;--hairline:#EEE;--sage:#4A7C5F;--red:#DC2626;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--white);border-bottom:1px solid var(--rule);height:54px;padding:0 20px;display:flex;align-items:center;gap:14px}
+.bolt{width:32px;height:32px;background:var(--yellow);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand{font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
+.hdiv{width:1px;height:18px;background:var(--rule)}
+.hsub{font-size:.82rem;color:var(--muted);font-weight:500}
+@media(max-width:480px){.hdiv,.hsub{display:none}}
+main{flex:1;max-width:680px;width:100%;margin:0 auto;padding:24px 16px 60px}
+.page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.page-sub{font-size:.88rem;color:var(--muted);margin-bottom:6px;line-height:1.5}
+.alt-link{font-size:.85rem;color:var(--muted);margin-bottom:24px}
+.alt-link a{color:var(--green);font-weight:700;text-decoration:none}
+.alt-link a:hover{text-decoration:underline}
+
+/* UPLOAD CARD */
+.upload-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);padding:24px;margin-bottom:14px}
+.upload-zone{border:2px dashed var(--green-md);border-radius:8px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--green-lt)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--green);background:#e0f0e8}
+.upload-icon{width:48px;height:48px;margin:0 auto 12px;background:var(--green-lt);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.upload-title{font-size:1rem;font-weight:700;color:var(--green-dk);margin-bottom:6px}
+.upload-sub{font-size:.82rem;color:var(--muted);line-height:1.5}
+.upload-sub strong{color:var(--ink2)}
+input[type=file]{display:none}
+.btn-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn-primary{flex:1;min-width:120px;padding:12px 18px;background:var(--green);border:none;border-radius:8px;color:#fff;font-family:'Figtree',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s}
+.btn-primary:hover{background:var(--green-dk)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{flex:1;min-width:120px;padding:12px 18px;background:var(--white);border:1.5px solid var(--green-bd);border-radius:8px;color:var(--green-dk);font-family:'Figtree',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .12s}
+.btn-secondary:hover{background:var(--green-lt)}
+.btn-camera{padding:12px 18px;background:var(--yellow);border:none;border-radius:8px;color:var(--ink);font-family:'Figtree',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s;white-space:nowrap}
+.btn-camera:hover{background:#d9a400}
+
+/* PREVIEW */
+.preview-wrap{margin-top:14px;display:none}
+.preview-file{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:8px}
+.preview-icon{width:36px;height:36px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.preview-name{font-size:.85rem;font-weight:600;color:var(--green-dk);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview-size{font-size:.75rem;color:var(--sage)}
+.btn-remove{width:28px;height:28px;border:none;background:none;cursor:pointer;color:var(--muted);font-size:1rem;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.btn-remove:hover{background:var(--hairline);color:var(--ink)}
+
+/* STATO ANALISI */
+.stato-wrap{margin-top:14px;display:none}
+.stato-loading{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--yellow-bg);border:1px solid var(--yellow-bd);border-radius:8px;font-size:.88rem;color:#7A6000;font-weight:600}
+.spinner{width:20px;height:20px;border:2.5px solid var(--yellow-bd);border-top-color:var(--yellow);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stato-ok{display:none;padding:14px 16px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:8px;font-size:.88rem;color:var(--green-dk);font-weight:600}
+.stato-err{display:none;padding:14px 16px;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;font-size:.88rem;color:var(--red);font-weight:600}
+
+/* DATI ESTRATTI */
+.dati-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;display:none}
+.dati-head{padding:12px 18px;background:var(--green-lt);border-bottom:1px solid var(--green-bd);font-size:.82rem;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:.4px;display:flex;justify-content:space-between;align-items:center}
+.dati-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:420px){.dati-grid{grid-template-columns:1fr}}
+.dati-row{padding:10px 18px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dati-row:last-child{border-bottom:none}
+.dati-label{font-size:.78rem;color:var(--muted);font-weight:500}
+.dati-val{font-size:.88rem;font-weight:700;color:var(--ink)}
+.btn-vai{width:calc(100% - 36px);margin:12px 18px;padding:13px;background:var(--green);border:none;border-radius:8px;color:#fff;font-family:'Figtree',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .12s}
+.btn-vai:hover{background:var(--green-dk)}
+
+/* MARZIA BANNER */
+.marzia-banner{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.marzia-icon{width:42px;height:42px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.marzia-text{flex:1}
+.marzia-text strong{display:block;font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:3px}
+.marzia-text span{font-size:.82rem;color:var(--muted)}
+.btn-marzia{padding:9px 16px;background:var(--green-lt);border:1.5px solid var(--green-bd);border-radius:8px;font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:700;color:var(--green-dk);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn-marzia:hover{background:var(--green-md);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <div class="bolt">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg>
+  </div>
+  <span class="brand">More Than Bills</span>
+  <div class="hdiv"></div>
+  <span class="hsub">Carica la tua bolletta</span>
+</header>
+
+<main>
+  <div style="height:16px"></div>
+  <div class="page-title">📄 Carica la tua bolletta</div>
+  <div class="page-sub">L'AI estrae automaticamente i dati e precompila il simulatore. Supporta PDF e foto.</div>
+  <div class="alt-link">Preferisci fare domande? <a href="marzia.html">💬 Chatta con MarzIA →</a></div>
+
+  <!-- UPLOAD CARD -->
+  <div class="upload-card">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+      <div class="upload-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="upload-title">Trascina qui il PDF o clicca per selezionare</div>
+      <div class="upload-sub">Supporta <strong>PDF</strong>, <strong>JPG</strong>, <strong>PNG</strong> · Max 10MB</div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="fileSelected(this)">
+
+    <div class="btn-row">
+      <button class="btn-camera" onclick="document.getElementById('camera-input').click()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        📸 Fotografa bolletta
+      </button>
+      <button class="btn-secondary" onclick="window.location.href='index.html'">
+        ✏️ Inserisci manualmente
+      </button>
+    </div>
+    <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="fileSelected(this)" style="display:none">
+
+    <div class="preview-wrap" id="preview-wrap">
+      <div class="preview-file">
+        <div class="preview-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="preview-name" id="preview-name">—</div>
+          <div class="preview-size" id="preview-size">—</div>
+        </div>
+        <button class="btn-remove" onclick="removeFile()" title="Rimuovi">✕</button>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn-primary" id="btn-analizza" onclick="analizzaBolletta()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Analizza con AI
+        </button>
+      </div>
+    </div>
+
+    <div class="stato-wrap" id="stato-wrap">
+      <div class="stato-loading" id="stato-loading">
+        <div class="spinner"></div>
+        Sto leggendo la bolletta con l'AI…
+      </div>
+      <div class="stato-ok" id="stato-ok">✅ Dati estratti correttamente!</div>
+      <div class="stato-err" id="stato-err"></div>
+    </div>
+  </div>
+
+  <!-- DATI ESTRATTI -->
+  <div class="dati-card" id="dati-card">
+    <div class="dati-head">
+      <span>📋 Dati rilevati dalla bolletta</span>
+      <span style="font-weight:500;text-transform:none;font-size:.75rem;color:var(--sage)">Verifica e correggi se necessario</span>
+    </div>
+    <div class="dati-grid" id="dati-grid"></div>
+    <button class="btn-vai" id="btn-vai" onclick="vaiAlSimulatore()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 11h10M7 15h6"/></svg>
+      Apri nel simulatore con questi dati →
+    </button>
+  </div>
+
+  <!-- BANNER MARZIA -->
+  <div class="marzia-banner">
+    <div class="marzia-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="marzia-text">
+      <strong>Hai dubbi sulla bolletta?</strong>
+      <span>Chatta con MarzIA, la nostra consulente AI — risponde subito a qualsiasi domanda.</span>
+    </div>
+    <a href="marzia.html" class="btn-marzia">Chatta →</a>
+  </div>
+
+</main>
+
+<script>
+let selectedFile = null;
+let fileBase64 = null;
+let datiEstratti = null;
+
+function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function dragLeave() { document.getElementById('upload-zone').classList.remove('drag'); }
+function dropFile(e) {
+  e.preventDefault(); dragLeave();
+  const f = e.dataTransfer.files[0];
+  if (f) processFile(f);
+}
+function fileSelected(input) { if (input.files[0]) processFile(input.files[0]); }
+
+function processFile(file) {
+  if (file.size > 10 * 1024 * 1024) { alert('File troppo grande. Massimo 10MB.'); return; }
+  selectedFile = file;
+  document.getElementById('preview-name').textContent = file.name;
+  document.getElementById('preview-size').textContent = (file.size / 1024).toFixed(0) + ' KB';
+  document.getElementById('preview-wrap').style.display = 'block';
+  document.getElementById('stato-wrap').style.display = 'none';
+  document.getElementById('dati-card').style.display = 'none';
+  const reader = new FileReader();
+  reader.onload = e => { fileBase64 = e.target.result.split(',')[1]; };
+  reader.readAsDataURL(file);
+}
+
+function removeFile() {
+  selectedFile = null; fileBase64 = null;
+  document.getElementById('preview-wrap').style.display = 'none';
+  document.getElementById('stato-wrap').style.display = 'none';
+  document.getElementById('dati-card').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  document.getElementById('camera-input').value = '';
+}
+
+async function analizzaBolletta() {
+  if (!fileBase64) { alert('Seleziona prima un file.'); return; }
+  const btn = document.getElementById('btn-analizza');
+  btn.disabled = true;
+  document.getElementById('stato-wrap').style.display = 'block';
+  document.getElementById('stato-loading').style.display = 'flex';
+  document.getElementById('stato-ok').style.display = 'none';
+  document.getElementById('stato-err').style.display = 'none';
+  document.getElementById('dati-card').style.display = 'none';
+
+  const mt = selectedFile.type || 'application/octet-stream';
+  const mediaType = mt === 'application/pdf' ? 'application/pdf' : mt.startsWith('image/') ? mt : 'image/jpeg';
+
+  try {
+    const res = await fetch('/.netlify/functions/leggi-bolletta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileData: fileBase64, mediaType })
+    });
+    const data = await res.json();
+    document.getElementById('stato-loading').style.display = 'none';
+
+    if (!data.ok || data.error) {
+      document.getElementById('stato-err').textContent = '❌ ' + (data.error || 'Errore sconosciuto');
+      document.getElementById('stato-err').style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+
+    datiEstratti = data.dati;
+    datiEstratti.tipo = 'variabile';
+    document.getElementById('stato-ok').style.display = 'block';
+    mostraDati(datiEstratti);
+  } catch (err) {
+    document.getElementById('stato-loading').style.display = 'none';
+    document.getElementById('stato-err').textContent = '❌ Errore di rete. Riprova.';
+    document.getElementById('stato-err').style.display = 'block';
+  }
+  btn.disabled = false;
+}
+
+function mostraDati(d) {
+  const nomi = { periodo:'Periodo', profilo:'Profilo', kw:'Potenza (kW)', f1:'Consumi F1 (kWh)', f2:'Consumi F2 (kWh)', f3:'Consumi F3 (kWh)' };
+  const display = {
+    periodo: d.bimestrale ? (d.bimestre || 'Bimestrale') + ' (bimestrale)' : (d.mese || '—'),
+    profilo: d.profilo, kw: d.kw, f1: d.f1, f2: d.f2, f3: d.f3
+  };
+  const formatta = (k, v) => {
+    if (v === null || v === undefined) return '<span style="color:#bbb">Non rilevato</span>';
+    if (k === 'profilo') return v === 'residente' ? 'Domestico Residente' : 'Domestico Non Residente';
+    return v;
+  };
+  document.getElementById('dati-grid').innerHTML = Object.entries(nomi).map(([k, label]) =>
+    `<div class="dati-row"><span class="dati-label">${label}</span><span class="dati-val">${formatta(k, display[k])}</span></div>`
+  ).join('');
+  if (d.bimestrale) {
+    const n = document.createElement('div');
+    n.style.cssText = 'padding:10px 18px;font-size:.78rem;color:#7A6000;background:#FFFBEB;border-top:1px solid #F0D060;';
+    n.innerHTML = '📅 Bolletta bimestrale — kWh già divisi per 2 (media mensile)';
+    document.getElementById('dati-grid').after(n);
+  }
+  document.getElementById('dati-card').style.display = 'block';
+}
+
+function vaiAlSimulatore() {
+  if (!datiEstratti) return;
+  const d = datiEstratti;
+  const params = new URLSearchParams();
+  if (d.f1 != null) params.set('f1', d.f1);
+  if (d.f2 != null) params.set('f2', d.f2);
+  if (d.f3 != null) params.set('f3', d.f3);
+  if (d.kw != null) params.set('kw', d.kw);
+  if (d.profilo) params.set('profilo', d.profilo);
+  params.set('tariffa', 'variabile');
+  if (d.bimestrale && d.bimestre) {
+    params.set('tipo', 'bimestrale');
+    params.set('bimestre', d.bimestre);
+  } else {
+    params.set('tipo', 'mensile');
+    if (d.mese) params.set('mese', d.mese);
+  }
+  window.location.href = 'index.html?' + params.toString();
+}
+</script>
+</body>
+</html>

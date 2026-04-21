@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>More Than Bills — Chatta con MarzIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#2D7A4F;--green-dk:#1F5C3A;--green-lt:#EBF5EE;--green-md:#A8D5B5;--green-bd:#C3E6CB;
+  --yellow:#F0B800;--yellow-bg:#FFFBEB;--yellow-bd:#F0D060;
+  --ink:#1a1a1a;--ink2:#333;--muted:#888;--bg:#F7F6F3;--white:#fff;
+  --rule:#E5E3DC;--hairline:#EEE;--sage:#4A7C5F;--red:#DC2626;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--white);border-bottom:1px solid var(--rule);height:54px;padding:0 20px;display:flex;align-items:center;gap:14px}
+.bolt{width:32px;height:32px;background:var(--yellow);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand{font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
+.hdiv{width:1px;height:18px;background:var(--rule)}
+.hsub{font-size:.82rem;color:var(--muted);font-weight:500}
+@media(max-width:480px){.hdiv,.hsub{display:none}}
+main{flex:1;max-width:680px;width:100%;margin:0 auto;padding:24px 16px 60px}
+.page-title{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.page-sub{font-size:.88rem;color:var(--muted);margin-bottom:6px;line-height:1.5}
+.alt-link{font-size:.85rem;color:var(--muted);margin-bottom:24px}
+.alt-link a{color:var(--green);font-weight:700;text-decoration:none}
+.alt-link a:hover{text-decoration:underline}
+
+/* CHAT */
+.chat-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;margin-bottom:14px}
+.chat-head{padding:12px 18px;background:var(--green);display:flex;align-items:center;gap:10px}
+.chat-head-title{font-size:.9rem;font-weight:800;color:#fff}
+.chat-head-sub{font-size:.72rem;color:rgba(255,255,255,.75);margin-top:1px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:360px;max-height:520px}
+.msg{max-width:88%;line-height:1.5;font-size:.85rem;padding:10px 14px;border-radius:12px}
+.msg.user{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:3px}
+.msg.ai{align-self:flex-start;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-bottom-left-radius:3px}
+.msg.ai.typing{opacity:.6}
+.chat-input-row{padding:12px;border-top:1px solid var(--rule);display:flex;gap:8px;background:var(--white)}
+.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--rule);border-radius:8px;font-family:'Figtree',sans-serif;font-size:.88rem;outline:none;resize:none;min-height:42px;max-height:100px;overflow-y:auto;transition:border .12s}
+.chat-input:focus{border-color:var(--green-md)}
+.btn-send{width:40px;height:40px;background:var(--green);border:none;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;align-self:flex-end}
+.btn-send:hover{background:var(--green-dk)}
+.btn-send:disabled{opacity:.4;cursor:not-allowed}
+.chat-suggestions{padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--hairline)}
+.sugg{padding:5px 10px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:20px;font-size:.75rem;font-weight:600;color:var(--green-dk);cursor:pointer;transition:background .12s;white-space:nowrap}
+.sugg:hover{background:var(--green-md);color:#fff}
+
+/* UPLOAD BANNER */
+.upload-banner{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.upload-icon-sm{width:42px;height:42px;background:var(--yellow);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.upload-text{flex:1}
+.upload-text strong{display:block;font-size:.9rem;font-weight:800;color:var(--ink);margin-bottom:3px}
+.upload-text span{font-size:.82rem;color:var(--muted)}
+.btn-upload-go{padding:9px 16px;background:var(--yellow);border:none;border-radius:8px;font-family:'Figtree',sans-serif;font-size:.82rem;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn-upload-go:hover{background:#d9a400}
+</style>
+</head>
+<body>
+<header>
+  <div class="bolt">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 3a16 16 0 0 0 15 15A16 16 0 0 0 5 3z"/></svg>
+  </div>
+  <span class="brand">More Than Bills</span>
+  <div class="hdiv"></div>
+  <span class="hsub">MarzIA — Consulente AI</span>
+</header>
+
+<main>
+  <div style="height:16px"></div>
+  <div class="page-title">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Ciao! Sono MarzIA 🤖
+  </div>
+  <div class="page-sub">Sono la tua consulente AI per le bollette elettriche. Chiedimi tutto — costi, risparmio, come funziona l'energia.</div>
+  <div class="alt-link">Hai la bolletta con te? <a href="upload.html">📄 Caricala e la analizzo →</a></div>
+
+  <!-- CHAT -->
+  <div class="chat-card">
+    <div class="chat-head">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div>
+        <div class="chat-head-title">MarzIA — Consulente bolletta AI</div>
+        <div class="chat-head-sub">Fai qualsiasi domanda sulla tua bolletta o sull'offerta</div>
+      </div>
+    </div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <span class="sugg" onclick="askSuggestion(this)">Perché scegliere un fornitore 100% green?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Cosa è il PUN?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Cosa è l'ASOS?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Perché pago le perdite di rete?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Come funzionano le segnalazioni?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Conviene il fisso o il variabile?</span>
+      <span class="sugg" onclick="askSuggestion(this)">Come uso il simulatore?</span>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">
+        👋 Ciao! Sono MarzIA, la tua consulente per le bollette elettriche.<br><br>
+        Puoi chiedermi qualsiasi cosa: come funzionano i costi, se conviene il fisso o il variabile, come risparmiare con le segnalazioni, cosa significano le voci in bolletta.<br><br>
+        Se hai la bolletta sottomano, puoi anche <a href="upload.html" style="color:var(--green);font-weight:700">caricarla qui</a> e la analizzo automaticamente!
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="Scrivi una domanda…" rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
+      <button class="btn-send" id="btn-send" onclick="sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- BANNER UPLOAD -->
+  <div class="upload-banner">
+    <div class="upload-icon-sm">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="upload-text">
+      <strong>Hai la bolletta in PDF o foto?</strong>
+      <span>L'AI estrae i dati automaticamente e precompila il simulatore.</span>
+    </div>
+    <a href="upload.html" class="btn-upload-go">Carica →</a>
+  </div>
+
+</main>
+
+<script>
+let chatHistory = [];
+let datiSimulatore = null;
+
+function askSuggestion(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  sendMessage();
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  appendMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const typingId = 'typing-' + Date.now();
+  appendMessage('ai', '…', typingId, true);
+
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory, datiSimulatore })
+    });
+    const data = await res.json();
+    removeMessage(typingId);
+    const reply = data.reply || 'Non riesco a rispondere al momento.';
+    appendMessage('ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch {
+    removeMessage(typingId);
+    appendMessage('ai', '❌ Errore di rete. Riprova tra un momento.');
+  }
+  btn.disabled = false;
+}
+
+function appendMessage(role, text, id, typing = false) {
+  const box = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role + (typing ? ' typing' : '');
+  if (id) div.id = id;
+  div.innerHTML = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^## (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^# (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^- (.+)$/gm,'• $1')
+    .replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:var(--green);font-weight:600;text-decoration:underline">$1</a>')
+    .replace(/\n/g,'<br>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeMessage(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// Legge params URL se arriva dal simulatore
+window.addEventListener('load', () => {
+  const p = new URLSearchParams(window.location.search);
+  if (p.has('f1') || p.has('mese')) {
+    datiSimulatore = {
+      f1: parseInt(p.get('f1')) || 0,
+      f2: parseInt(p.get('f2')) || 0,
+      f3: parseInt(p.get('f3')) || 0,
+      kw: parseFloat(p.get('kw')) || 3,
+      mese: p.get('mese') || '',
+      profilo: p.get('profilo') || 'residente',
+      tariffa: 'variabile',
+      totale: p.get('totale') || '',
+      quarta: p.get('quarta') || '',
+      pun: p.get('pun') || ''
+    };
+  }
+  document.getElementById('chat-input').focus();
+});
+</script>
+</body>
+</html>
