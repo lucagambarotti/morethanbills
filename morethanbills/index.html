@@ -447,21 +447,85 @@ select:focus,input[type=number]:focus{outline:none;border-color:var(--green-bd);
       </div>
       <div class="fg">
         <label>Profilo</label>
-        <select id="profilo">
+        <select id="profilo" onchange="onProfiloChange()">
           <option value="residente">Domestico residente</option>
           <option value="nonResidente">Domestico non residente</option>
+          <option value="altriUsi">Altri usi (BT)</option>
         </select>
       </div>
       <div class="fg">
         <label>Tipo tariffa</label>
         <select id="tariffa-tipo" onchange="onTariffaTipoChange()">
-          <option value="variabile">⚡ Variabile (PUN + spread)</option>
-          <option value="fissa">🔒 Fissa</option>
+          <option value="variabile">&#9889; Variabile (PUN + spread)</option>
+          <option value="fissa">&#128274; Fissa</option>
         </select>
       </div>
-      <div class="fg">
+      <div class="fg" id="wrap-kw-contratt">
         <label>Potenza contrattuale (kW)</label>
         <input type="number" id="kw" min="0.1" step="0.5" value="3">
+      </div>
+      <!-- Campo MAX PRELEVATA — visibile solo per Altri Usi -->
+      <div class="fg" id="wrap-kw-max" style="display:none">
+        <label>Potenza max prelevata (kW) <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--light)">— dalla bolletta, non quella contrattuale</span></label>
+        <input type="number" id="kw-max" min="0.1" step="0.1" value="3">
+      </div>
+      <!-- Panel opzioni AU — visibile solo per Altri Usi -->
+      <div id="au-panel" class="fg full" style="display:none">
+        <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:8px;padding:14px 16px">
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#2563EB;margin-bottom:12px">
+            &#9732; Parametri Altri Usi (BT)
+          </div>
+          <div class="fgrid" style="gap:10px 16px">
+            <div class="fg">
+              <label>Tipo offerta</label>
+              <select id="au-offerta" onchange="onAuChange()">
+                <option value="variabile">Variabile — PUNm &times; 1,23 &minus; 0,0397</option>
+                <option value="fissa">Prezzo fisso</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>IVA applicabile</label>
+              <select id="au-iva">
+                <option value="22">22% — standard</option>
+                <option value="10">10% — industria / agricoltura</option>
+              </select>
+            </div>
+            <div class="fg full">
+              <label>Tipo misurazione</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
+                <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px solid #93C5FD;border-radius:7px;cursor:pointer;font-size:.84rem;font-weight:600;background:#EFF6FF;color:#2563EB" id="rb-mono">
+                  <input type="radio" name="au-fascia" value="mono" checked onchange="onAuChange()" style="accent-color:#2563EB"> Monorario F0 unico
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px solid #C8D1C8;border-radius:7px;cursor:pointer;font-size:.84rem;font-weight:600;background:#fff;color:#374140" id="rb-multi">
+                  <input type="radio" name="au-fascia" value="multi" onchange="onAuChange()" style="accent-color:#2563EB"> Multiorario F1 / F2 / F3
+                </label>
+              </div>
+            </div>
+            <!-- PUN monorario: badge auto + override opzionale -->
+            <div id="au-pun-mono" class="fg full">
+              <label>PUN di riferimento (F0)</label>
+              <div id="au-pun-auto-badge" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px">
+                <span id="au-pun-badge" style="background:#EFF6FF;border:1px solid #93C5FD;border-radius:6px;padding:4px 12px;font-size:.84rem;font-weight:700;color:#2563EB"></span>
+                <span style="font-size:.75rem;color:var(--muted)">&#9650; automatico dal mese selezionato</span>
+                <button type="button" id="au-pun-override-btn" onclick="toggleAuPunOverride()" style="background:none;border:none;font-family:Figtree,sans-serif;font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;padding:0">Personalizza</button>
+              </div>
+              <div id="au-pun-override-wrap" style="display:none;margin-top:6px">
+                <input type="number" id="au-pun-f0" min="0" step="0.1" placeholder="" style="max-width:200px">
+                <span style="font-size:.72rem;color:var(--muted);margin-left:6px">€/MWh &nbsp;— <button type="button" onclick="clearAuPunOverride()" style="background:none;border:none;font-family:Figtree,sans-serif;font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;padding:0">Usa automatico</button></span>
+              </div>
+            </div>
+            <!-- PUN multiorario: 3 campi opzionali con placeholder = valore auto -->
+            <div id="au-pun-multi" class="fg full" style="display:none">
+              <label>PUN per fascia (&#8364;/MWh) <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--light)">— lascia vuoto = usa il PUN F0 del mese</span></label>
+              <div class="kwh-grid">
+                <div class="fg"><label>F1</label><input type="number" id="au-pun-f1" min="0" step="0.1"></div>
+                <div class="fg"><label>F2</label><input type="number" id="au-pun-f2" min="0" step="0.1"></div>
+                <div class="fg"><label>F3</label><input type="number" id="au-pun-f3" min="0" step="0.1"></div>
+              </div>
+              <p class="fg-hint" id="au-pun-multi-hint"></p>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="fg full">
         <label id="kwh-label">Consumi del mese per fascia (kWh)</label>
@@ -595,14 +659,17 @@ const Q4 = { dispFisso:0.007, commFisso:11.61, dispbt:0.102592, dispVar:0.037689
 const Q1 = { dispFisso:0.007, commFisso:11.61, dispbt:0.102592, dispVar:0.021242, traspFisso:1.92, traspPot:1.976567, traspVar:0.01473, asos:0.028657, arim:0.001638, asosFisso:7.396 };
 
 // PUN mensili (€/MWh) — valori confermati da CTE o stimati*
+// mc = Mercato Capacità €/kWh NETTI (delibera 586/2025/R/eel, aggiornato mensilmente)
+//   — Feb: 1,0583 c€/kWh net (da bolletta reale) | Mar: 0,4349 c€/kWh net (da bolletta)
+//   — Apr: 0,3981 c€/kWh net (da CTE LAIG) | altri mesi: stima da tasso generale Q1
 const T = {
-  "Ottobre 2025":  { pun:111.04, ...Q4 },
-  "Novembre 2025": { pun:117.09, ...Q4 },
-  "Dicembre 2025": { pun:115.49, ...Q4 },
-  "Gennaio 2026":  { pun:132.96, ...Q1 },
-  "Febbraio 2026": { pun:114.41, ...Q1 },
-  "Marzo 2026":    { pun:143.4,  ...Q1 },
-  "Aprile 2026":   { pun:124.76, ...Q1 }
+  "Ottobre 2025":  { pun:111.04, ...Q4, mc:0.009409 },
+  "Novembre 2025": { pun:117.09, ...Q4, mc:0.009409 },
+  "Dicembre 2025": { pun:115.49, ...Q4, mc:0.009409 },
+  "Gennaio 2026":  { pun:132.96, ...Q1, mc:0.009409 },
+  "Febbraio 2026": { pun:114.41, ...Q1, mc:0.010583 },
+  "Marzo 2026":    { pun:143.4,  ...Q1, mc:0.004349 },
+  "Aprile 2026":   { pun:124.76, ...Q1, mc:0.003981 }
 };
 
 // Periodi bimestrali — pun calcolato dinamicamente come media dei 2 mesi
@@ -623,8 +690,28 @@ function getBimPun(key) {
 }
 /* ============================================================  COSTANTI  */
 const C = { spread:0.034, perdite:0.1, accisa:0.0227, iva:10.0, pfAdj:-10.0, friendDisc:0.01 };
-// Tariffa fissa prezzi (perdite 10% già incluse nel prezzo)
+// Tariffa fissa prezzi domestico (perdite 10% gia incluse)
 const FISSO = { mono:0.1991, f1:0.2112, f2:0.2013, f3:0.1936 };
+
+/* ============================================================  ALTRI USI — COSTANTI  */
+// Tariffe trasporto e oneri AU — Q1 2026 VERIFICATE su bollette reali Nereide Feb+Mar 2026
+// Applicare MAX PRELEVATA (non contrattuale) per quote potenza — valore decimale esatto
+const AU_RETE = {
+  traspFisso: 2.406367, traspPot: 2.744142, traspVar: 0.015390,
+  asosFisso: 0.994700, arimFisso: 0.252300,
+  asosPot: 1.134300, arimPot: 0.287700,
+  asosVar: 0.041758, arimVar: 0.001614
+};
+// CTE Luce Amica IG — corrispettivi AU (tutti i valori per kWh NETTI, perdite incluse)
+const AU_CTE = {
+  P0: 1.23, alpha: 0.0397,
+  sbil: 0.021670,     // €/kWh NET (= 0,019700/kWh LORDI, verificato da bollette)
+  tideVar: 0.011550,  // TIDE variabile Q2 2026 €/kWh NET
+  tideFisso: 0.007,   // €/mese
+  ccvAnno: 138.00,    // €/anno = 11,50 €/mese
+  accisa: 0.0125,     // €/kWh — nessuna franchigia per AU
+  fissoMono: 0.1991, fissoF1: 0.2211, fissoF2: 0.2068, fissoF3: 0.1716
+};
 
 const r2 = v => Math.round(v*100)/100;
 const r6 = v => Math.round(v*1e6)/1e6;
@@ -679,17 +766,171 @@ function calculateFixed(mese, t, f1, f2, f3, kw, profilo, tipoFisso, periodoLabe
   };
 }
 
-function onTariffaTipoChange() {
-  const isFissa = document.getElementById('tariffa-tipo').value === 'fissa';
-  // Per la fissa il PUN badge non è rilevante, nascondiamo
-  const bm = document.getElementById('pun-badge-mese');
-  const bb = document.getElementById('pun-badge-bim');
-  if(bm) bm.style.display = isFissa ? 'none' : 'inline-flex';
-  if(bb) bb.style.display = isFissa ? 'none' : 'inline-flex';
+function onProfiloChange() {
+  const isAU = document.getElementById('profilo').value === 'altriUsi';
+  document.getElementById('au-panel').style.display = isAU ? 'block' : 'none';
+  document.getElementById('wrap-kw-max').style.display = isAU ? 'block' : 'none';
+  document.getElementById('tariffa-tipo').closest('.fg').style.display = isAU ? 'none' : '';
+  if(isAU){ onAuChange(); updateAuPunBadge(); }
+  if(lastResult) calcola();
+}
+function updateAuPunBadge() {
+  const mese = document.getElementById('mese').value;
+  const t = T[mese];
+  if(!t) return;
+  const pun = t.pun;
+  const badge = document.getElementById('au-pun-badge');
+  if(badge) badge.textContent = (pun).toFixed(2).replace('.',',') + ' €/MWh';
+  // Aggiorna placeholder per F1/F2/F3
+  const hint = document.getElementById('au-pun-multi-hint');
+  if(hint) hint.textContent = 'PUN automatico dal mese: ' + pun.toFixed(2).replace('.',',') + ' €/MWh (uguale per tutte le fasce se non specificato)';
+  ['au-pun-f1','au-pun-f2','au-pun-f3'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.placeholder = pun.toFixed(1).replace('.',',');
+  });
+}
+function toggleAuPunOverride() {
+  const wrap = document.getElementById('au-pun-override-wrap');
+  const btn = document.getElementById('au-pun-override-btn');
+  const open = wrap.style.display === 'none';
+  wrap.style.display = open ? 'flex' : 'none';
+  if(btn) btn.textContent = open ? 'Annulla' : 'Personalizza';
+  if(open) document.getElementById('au-pun-f0').focus();
+  else { document.getElementById('au-pun-f0').value = ''; if(lastResult) calcola(); }
+}
+function clearAuPunOverride() {
+  document.getElementById('au-pun-f0').value = '';
+  document.getElementById('au-pun-override-wrap').style.display = 'none';
+  document.getElementById('au-pun-override-btn').textContent = 'Personalizza';
+  if(lastResult) calcola();
+}
+function onAuChange() {
+  const offerta = document.getElementById('au-offerta').value;
+  const fascia  = document.querySelector("input[name='au-fascia']:checked").value;
+  const isVar = offerta === 'variabile', isMono = fascia === 'mono';
+  document.getElementById('au-pun-mono').style.display = (isVar && isMono) ? 'block' : 'none';
+  document.getElementById('au-pun-multi').style.display = (isVar && !isMono) ? 'block' : 'none';
+  const rbMono = document.getElementById('rb-mono'), rbMulti = document.getElementById('rb-multi');
+  if(rbMono)  { rbMono.style.borderColor  = isMono ? '#2563EB':'#C8D1C8'; rbMono.style.background  = isMono ? '#EFF6FF':'#fff'; rbMono.style.color  = isMono ? '#2563EB':'#374140'; }
+  if(rbMulti) { rbMulti.style.borderColor = !isMono? '#2563EB':'#C8D1C8'; rbMulti.style.background = !isMono? '#EFF6FF':'#fff'; rbMulti.style.color = !isMono? '#2563EB':'#374140'; }
   if(lastResult) calcola();
 }
 
-/* ============================================================  CALCULATE  */
+/* ============================================================  CALCULATE AU  */
+// Struttura verificata su bollette reali Nereide Feb+Mar 2026 (ALTRI USI BT)
+// Differenze chiave vs domestico:
+//   - Quota potenza su MAX PRELEVATA (non contrattuale)
+//   - Oneri di sistema separati da trasporto (con quote fissa/potenza/variabile proprie)
+//   - Accisa 0,0125 €/kWh senza franchigia
+//   - IVA 22% standard (o 10% per industria/agricoltura)
+//   - Nessun Canone RAI
+function calculateAU(mese, t, f1, f2, f3, kwMax, offerta, fascia, ivaRate, punF0ov, punF1ov, punF2ov, punF3ov) {
+  if(!t) throw new Error("Tariffe non trovate per: "+mese);
+  if(kwMax<=0) throw new Error("Potenza MAX prelevata deve essere > 0");
+  if(f1<0||f2<0||f3<0) throw new Error("kWh non puo essere negativo");
+  const tot = f1+f2+f3;
+  if(tot===0) throw new Error("Inserisci almeno un kWh di consumo");
+
+  const ccvMese = AU_CTE.ccvAnno/12;  // 11,50 €/mese
+  const punBase = t.pun/1000;          // PUN mese in EUR/kWh (fallback)
+  const mc = t.mc || 0.003981;         // Mercato Capacita EUR/kWh NET (mensile)
+
+  // Risolvi PUN per fascia
+  const pF0 = punF0ov || punBase;
+  const pF1 = punF1ov || pF0, pF2 = punF2ov || pF0, pF3 = punF3ov || pF0;
+
+  // Costo energia — applicato ai kWh NETTI (perdite gia incluse nei corrispettivi CTE)
+  let eCosto=0, punEff=pF0, qvLabel='';
+  if(offerta==='variabile') {
+    if(fascia==='mono') {
+      const Qv = pF0*AU_CTE.P0 - AU_CTE.alpha;
+      if(Qv<0) throw new Error("PUN "+( pF0*1000).toFixed(1)+" EUR/MWh troppo basso: Qv = "+Qv.toFixed(5)+". Min ~32 EUR/MWh.");
+      eCosto = Qv*tot; qvLabel = Qv.toFixed(5)+" EUR/kWh (F0)";
+    } else {
+      const Q1=pF1*AU_CTE.P0-AU_CTE.alpha, Q2=pF2*AU_CTE.P0-AU_CTE.alpha, Q3=pF3*AU_CTE.P0-AU_CTE.alpha;
+      if(Q1<0||Q2<0||Q3<0) throw new Error("PUN troppo basso per una o piu fasce: Qv negativo");
+      eCosto = Q1*f1+Q2*f2+Q3*f3;
+      punEff = tot>0?(pF1*f1+pF2*f2+pF3*f3)/tot:pF0;
+      qvLabel = "F1:"+Q1.toFixed(5)+" F2:"+Q2.toFixed(5)+" F3:"+Q3.toFixed(5)+" EUR/kWh";
+    }
+  } else {
+    if(fascia==='mono') { eCosto=AU_CTE.fissoMono*tot; qvLabel=AU_CTE.fissoMono.toFixed(5)+" EUR/kWh (fisso mono)"; }
+    else { eCosto=AU_CTE.fissoF1*f1+AU_CTE.fissoF2*f2+AU_CTE.fissoF3*f3; qvLabel="F1:"+AU_CTE.fissoF1+" F2:"+AU_CTE.fissoF2+" F3:"+AU_CTE.fissoF3+" EUR/kWh (fisso)"; }
+    punEff = pF0;
+  }
+
+  // Componenti regolate per kWh NETTI (sbil + TIDE var + MC)
+  const varReg = (AU_CTE.sbil + AU_CTE.tideVar + mc)*tot;
+  const varRegKwh = AU_CTE.sbil + AU_CTE.tideVar + mc;
+
+  // Materia energia
+  const ME = r2(ccvMese + AU_CTE.tideFisso + C.pfAdj + eCosto + varReg);
+
+  // Trasporto (su MAX PRELEVATA — valore decimale esatto)
+  const tFissa = r2(AU_RETE.traspFisso);
+  const tPot   = r2(AU_RETE.traspPot * kwMax);
+  const tVar   = r2(AU_RETE.traspVar * tot);
+  const TR = r2(tFissa + tPot + tVar);
+
+  // Oneri di sistema (su MAX PRELEVATA per quote potenza, su kWh NET per quote var)
+  const oFissa = r2(AU_RETE.asosFisso + AU_RETE.arimFisso);
+  const oPot   = r2((AU_RETE.asosPot + AU_RETE.arimPot) * kwMax);
+  const oVar   = r2((AU_RETE.asosVar + AU_RETE.arimVar) * tot);
+  const ON = r2(oFissa + oPot + oVar);
+
+  // Accisa (nessuna franchigia per AU)
+  const IMP = r2(AU_CTE.accisa * tot);
+
+  // IVA e totale
+  const impon = r2(ME + TR + ON + IMP);
+  const IVA   = r2(impon * ivaRate);
+  const TOT   = r2(impon + IVA);
+  const Q4r   = r2(TOT + 10);          // dalla 4a bolletta (senza bonus NC)
+  const EQ12  = r2((3*TOT + 9*Q4r)/12); // media annua
+
+  // Segnalazioni — target: recuperare CCV annuo dopo bonus benvenuto
+  // sX = ceil((CCV_anno - bonus_benvenuto) / beneficio_per_segn)
+  // = ceil((138 - 30) / 60) = ceil(1.8) = 2  — FISSO indipendente dal consumo
+  const cA = tot*12;
+  const sAM = C.friendDisc*250, sAA=sAM*12, bPM=10, bPA=30+sAA, bPMs=bPA/12;
+  const sX = Math.max(0, Math.ceil((AU_CTE.ccvAnno - 30) / bPA)); // = 2
+  const sc = n => ({
+    prime3:  r2(TOT - n*(bPM+sAM)),
+    quarta:  r2(Q4r - n*sAM),
+    media12: r2(EQ12 - n*bPMs)
+  });
+
+  // Overhead per kWh rispetto al PUN puro (per informazione)
+  const overheadKwh = r6((eCosto + varReg)/tot - punEff);
+
+  return {
+    tipo:'au', mese, periodoLabel:mese, isBim:false, divisore:1,
+    profilo:'altriUsi', offerta, fascia, ivaRate, ivaPerc:Math.round(ivaRate*100),
+    kw:kwMax, f1, f2, f3, totalKwh:tot,
+    materiaEnergia:ME, corrispettivi:r2(ccvMese),
+    trasporto:TR, oneri:ON, imposte:IMP, iva:IVA, canone:0,
+    totale:TOT, totaleDallaQuarta:Q4r, totaleEq12:EQ12,
+    consumoMensile:tot, consumoAnnuo:cA,
+    bonusBenvenutoTot:30, bonusBenvenutoMedio:2.5,
+    scontoAmicoMedioMese:sAM, scontoAmicoMedioAnno:sAA,
+    beneficioPerSegnPerAnno:bPA, beneficioPerSegnPerMese:bPMs, bonusMensileReferral:bPM,
+    segnalazioniPerZero:sX, s1:sc(1), s2:sc(2), sN:sc(sX),
+    pun:t.pun, punEff:r2(punEff*1000), mc,
+    overheadKwh, qvLabel,
+    eCosto:r2(eCosto), varReg:r2(varReg), varRegKwh:r6(varRegKwh),
+    tFissa, tPot, tVar, oFissa, oPot, oVar,
+    impon,
+    // NON usato da bolletta DOM, ma per compatibilita renderAll
+    spreadNominale:overheadKwh, txKwh:tot, asosFissoNR:0,
+    eu:r6((eCosto+varReg)/tot), pun1k:r6(punEff),
+    mDF:AU_CTE.tideFisso, mCF:r2(ccvMese), mPF:C.pfAdj, mDB:0, mDV:0, mE:r2(eCosto), mP:0,
+    traspFisso:AU_RETE.traspFisso, traspPot:AU_RETE.traspPot, traspPotTot:tPot,
+    traspVar:AU_RETE.traspVar, traspVarTot:tVar,
+    asos:AU_RETE.asosVar, arim:AU_RETE.arimVar, asosFisso:0,
+    kfv:r2(tot), loss:0, dispVar:AU_CTE.tideVar, impon:r2(impon),
+    kwMax
+  };
+}
 function calculateWith(mese,t,f1,f2,f3,kw,profilo,periodoLabel,isBim,divisore){
   if(!t)throw new Error("Tariffe non trovate per: "+mese);
   if(kw<=0)throw new Error("kW deve essere > 0");
@@ -877,7 +1118,31 @@ function calcola(){
 
   try{
     _save();
-    if(tariffaTipo==='variabile'){
+    if(profilo==='altriUsi') {
+      // ---- ALTRI USI ----
+      const kwMax = parseFloat(document.getElementById('kw-max').value)||3;
+      const offerta = document.getElementById('au-offerta').value;
+      const fascia  = document.querySelector("input[name='au-fascia']:checked").value;
+      const ivaRate = parseFloat(document.getElementById('au-iva').value)/100;
+      let pF0=null,pF1=null,pF2=null,pF3=null;
+      if(offerta==='variabile') {
+        if(fascia==='mono') {
+          const v=parseFloat(document.getElementById('au-pun-f0').value);
+          if(!isNaN(v)&&v>0) pF0=v/1000;
+        } else {
+          const v1=parseFloat(document.getElementById('au-pun-f1').value);
+          const v2=parseFloat(document.getElementById('au-pun-f2').value);
+          const v3=parseFloat(document.getElementById('au-pun-f3').value);
+          if(!isNaN(v1)&&v1>0) pF1=v1/1000;
+          if(!isNaN(v2)&&v2>0) pF2=v2/1000;
+          if(!isNaN(v3)&&v3>0) pF3=v3/1000;
+          if(pF1||pF2||pF3) pF0=pF1||pF2||pF3;
+        }
+      }
+      const r=calculateAU(mese,tariffe,f1,f2,f3,kwMax,offerta,fascia,ivaRate,pF0,pF1,pF2,pF3);
+      lastResult=r; renderAllAU(r);
+      document.getElementById('res-tariffa').style.display='none';
+    } else if(tariffaTipo==='variabile'){
       const r=calculateWith(mese,tariffe,f1,f2,f3,kw,profilo,periodoLabel,isBim,divisore);
       r.tariffaTipo='variabile';
       lastResult=r; renderAll(r);
@@ -895,7 +1160,9 @@ function calcola(){
       document.getElementById('res-tariffa').style.display='block';
     }
     document.getElementById("result-wrap").classList.add("vis");
-    document.getElementById("broker-lock-wrap").style.display = "flex";
+    const isAU = profilo==='altriUsi';
+    document.getElementById("broker-lock-wrap").style.display = isAU ? "none" : "flex";
+    const bw = document.querySelector('.boll-btn-wrap'); if(bw) bw.style.display = isAU ? 'none' : '';
     const bp = document.getElementById("broker-panel"); if(bp) { bp.classList.remove("vis"); bp.innerHTML=""; }
     brokerUnlocked = false;
     renderFields(); updatePunBadge();
@@ -1089,6 +1356,160 @@ kWh tassabili accisa    = ${fn(r.txKwh)} kWh${r.profilo==="residente"?" (franchi
     <div class="rblock-head"><span class="rblock-head-title">Dettaglio materia energia</span></div>
     <button class="acc-trigger" style="border-top:none" onclick="toggleAcc('acc-mat',this)"><span class="chev">&#9660;</span> Espandi dettaglio</button>
     <div class="acc-panel" id="acc-mat"><pre>${accDet}</pre></div>`;
+}
+
+/* ============================================================  RENDER ALTRI USI  */
+function renderAllAU(r) {
+  const offLabel = r.offerta==='variabile' ? 'Variabile (PUNm x 1,23 - 0,0397)' : 'Prezzo Fisso';
+  const fascLabel = r.fascia==='mono' ? 'Monorario F0' : 'Multiorario F1/F2/F3';
+  const{s1,s2,sN}=r, showN=r.segnalazioniPerZero>2;
+
+  /* HEADER */
+  document.getElementById("res-header").innerHTML=`
+    <div class="rh-meta">
+      <div class="rh-tag">
+        Periodo &middot; <span>${r.mese}</span>
+        &nbsp;&middot;&nbsp;
+        <span style="background:#EFF6FF;color:#2563EB;border:1px solid #93C5FD;padding:1px 8px;border-radius:4px;font-size:.66rem;font-weight:800">ALTRI USI BT</span>
+        &nbsp;&middot;&nbsp; Pot. max <span>${r.kw} kW</span>
+        &nbsp;&middot;&nbsp; IVA <span>${r.ivaPerc}%</span>
+      </div>
+      <div class="rh-title">${r.totalKwh} kWh &nbsp;(F1:${r.f1} F2:${r.f2} F3:${r.f3}) &middot; ${offLabel} &middot; ${fascLabel}</div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <div class="rh-amount"><div class="rh-alabel">Totale bolletta</div><div class="rh-aval">${fe(r.totale)}</div></div>
+      <div class="rh-icon" style="background:#EFF6FF;border:1px solid #93C5FD"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+    </div>`;
+
+  /* STRIP */
+  document.getElementById("res-strip").innerHTML=`
+    <div class="info-strip" style="background:#EFF6FF;border:1px solid #93C5FD;border-radius:8px;color:#1D4ED8;margin-bottom:10px">
+      &#9432;&nbsp; Tariffe trasporto e oneri: <strong>Q1 2026</strong> (verificate da bollette reali). Potranno aggiornarsi per Q2 2026.
+    </div>`;
+
+  /* BREAKDOWN — struttura identica a bolletta reale */
+  document.getElementById("res-breakdown").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Dettaglio voci di spesa</span></div>
+    <div class="trow"><span class="t-name">Spesa materia energia</span><span class="t-val">${fe(r.materiaEnergia)}</span></div>
+    <div class="trow sub"><span class="t-name">di cui CCV (Corrispettivi Commercializzazione)</span><span class="t-val">&euro; ${r.corrispettivi.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow bonus"><span class="t-name">&#8627; Bonus Nuovo Cliente / Porta un Amico (prime 3 bollette)</span><span class="t-val">&minus;&euro; 10,00</span></div>
+    <div class="trow sub"><span class="t-name">di cui energia (${r.offerta==='variabile'?'Qv':'prezzo fisso'} &times; ${r.totalKwh} kWh)</span><span class="t-val">&euro; ${r.eCosto.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui sbil. + TIDE var. + mercato cap. &times; ${r.totalKwh} kWh</span><span class="t-val">&euro; ${r.varReg.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow"><span class="t-name">Trasporto, distribuzione e misura</span><span class="t-val">${fe(r.trasporto)}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quota fissa</span><span class="t-val">&euro; ${r.tFissa.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quota potenza (${r.kw} kW max)</span><span class="t-val">&euro; ${r.tPot.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quota energia</span><span class="t-val">&euro; ${r.tVar.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow"><span class="t-name">Oneri di sistema (ASOS + ARIM)</span><span class="t-val">${fe(r.oneri)}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quote fisse</span><span class="t-val">&euro; ${r.oFissa.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quote potenza (${r.kw} kW max)</span><span class="t-val">&euro; ${r.oPot.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui quote variabili</span><span class="t-val">&euro; ${r.oVar.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow"><span class="t-name">Accisa (0,0125 &euro;/kWh &mdash; no franchigia)</span><span class="t-val">${fe(r.imposte)}</span></div>
+    <div class="trow dimmed"><span class="t-name">IVA (${r.ivaPerc}%)</span><span class="t-val">${fe(r.iva)}</span></div>`;
+
+  /* TOTALI */
+  document.getElementById("res-totali").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Totale fornitura</span></div>
+    <div class="trow total"><span class="t-name">Totale bolletta</span><span class="t-val">${fe(r.totale)}</span></div>
+    <div class="trow"><span class="t-name">Dalla 4&ordf; bolletta</span><span class="t-val">${fe(r.totaleDallaQuarta)}</span></div>
+    <div class="trow" style="border-bottom:none"><span class="t-name">Media mensile su 12 mesi</span><span class="t-val">${fe(r.totaleEq12)}</span></div>`;
+
+  /* Nascondo confronto tariffa (non applicabile per AU) */
+  document.getElementById('res-tariffa').style.display='none';
+
+  /* SEGNALAZIONI */
+  const siAU = r.segnalazioniPerZero<=0
+    ? "Il vantaggio delle segnalazioni copre gia il costo annuo di commercializzazione."
+    : r.segnalazioniPerZero===1
+    ? "Con 1 segnalato da 250 kWh/mese recuperi gia l'intero costo annuo di commercializzazione (CCV)."
+    : `Con ${r.segnalazioniPerZero} segnalati da 250 kWh/mese recuperi l'intero costo annuo di commercializzazione (CCV ${fe(AU_CTE.ccvAnno)}).`;
+
+  document.getElementById("res-segn").innerHTML=`
+    <div class="rblock-head" style="background:var(--green-lt);border-bottom-color:var(--green-md)">
+      <span class="rblock-head-title" style="color:var(--sage)">Simulazione vantaggi su 12 mesi</span>
+    </div>
+    <div class="segn-kpi">
+      <div class="kpi-left">
+        <div class="kpi-label">Segnalazioni per recuperare il CCV &middot; segnalato medio 250 kWh/mese</div>
+        <div class="kpi-val"><span class="kpi-num">${r.segnalazioniPerZero}</span><span class="kpi-unit">segnalazioni</span></div>
+      </div>
+      <div class="kpi-tags">
+        <span class="ktag ktag-yellow">CCV ${fe(AU_CTE.ccvAnno)}/anno</span>
+        <span class="ktag ktag-green">Beneficio ${fe(r.beneficioPerSegnPerAnno)}/segn./anno</span>
+      </div>
+    </div>
+    <div class="segn-intro-strip">${siAU}</div>
+    <div class="scen-row-head"><span>Scenario</span><span>Prime 3</span><span>Dalla 4&ordf;</span><span>Media 12 mesi</span></div>
+    <div class="scen-data-row"><div class="s-label"><span class="s-badge">1</span>1 segnalazione</div><div class="s-val">${fe(s1.prime3)}</div><div class="s-val">${fe(s1.quarta)}</div><div class="s-val">${fe(s1.media12)}</div></div>
+    <div class="scen-data-row"><div class="s-label"><span class="s-badge">2</span>2 segnalazioni</div><div class="s-val">${fe(s2.prime3)}</div><div class="s-val">${fe(s2.quarta)}</div><div class="s-val">${fe(s2.media12)}</div></div>
+    ${showN?`<div class="scen-data-row"><div class="s-label"><span class="s-badge">${r.segnalazioniPerZero}</span>Con ${r.segnalazioniPerZero} segnalazioni</div><div class="s-val">${fe(sN.prime3)}</div><div class="s-val">${fe(sN.quarta)}</div><div class="s-val">${fe(sN.media12)}</div></div>`:""}`;
+
+  /* GIOCA SEGNALAZIONI (riciclo sezione) */
+  document.getElementById("res-segn-play").innerHTML='';
+
+  /* EXTRA UTENZE */
+  document.getElementById("res-ext").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">&#9889; Risparmia ancora di piu</span></div>
+    <div style="padding:16px 18px 0;display:flex;align-items:flex-start;gap:14px">
+      <div style="width:40px;height:40px;border-radius:9px;background:#EFF6FF;border:1px solid #93C5FD;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div><h3 style="font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:3px">Hai altre utenze a tuo nome?</h3>
+      <p style="font-size:.84rem;color:var(--ink2);line-height:1.5">Inserisci il consumo annuo delle altre utenze e calcola quanti sconti matureresti gia dal primo mese.</p></div>
+    </div>
+    <div style="padding:12px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--hairline);background:var(--bg);flex-wrap:wrap;margin-top:14px">
+      <label style="font-size:.79rem;font-weight:600;color:var(--ink2)">Numero altre utenze:</label>
+      <select id="ext-count" style="width:68px;padding:6px 8px;font-size:.84rem" onchange="setExtraCount(parseInt(this.value))">
+        <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+      </select>
+    </div>
+    <div style="padding:16px 18px">
+      <div class="ext-fields-grid" id="ext-fields-inner"></div>
+      <button class="btn-recalc" id="ext-calc-btn" onclick="renderExtraResult()" style="display:none">&#8635; Ricalcola con questi sconti</button>
+      <div id="ext-res-rows"></div>
+    </div>`;
+
+  /* DETTAGLIO TECNICO */
+  const detAU = [
+    "=== ALTRI USI BT — " + r.offerta.toUpperCase() + " — " + r.fascia.toUpperCase() + " — IVA " + r.ivaPerc + "% ===",
+    "Mese: " + r.mese + "  |  PUN: " + r.pun + " EUR/MWh  |  Pot. max prelevata: " + r.kw + " kW",
+    "",
+    "--- MATERIA ENERGIA ---",
+    "PUN rif.: " + r.punEff + " EUR/MWh",
+    "Corrispettivo energia: " + r.qvLabel,
+    "Sbil " + AU_CTE.sbil.toFixed(5) + " + TIDE_var " + AU_CTE.tideVar.toFixed(5) + " + MC " + r.mc.toFixed(6) + " = " + r.varRegKwh.toFixed(6) + " EUR/kWh NET",
+    "CCV: " + r.corrispettivi.toFixed(2) + " EUR/mese  |  TIDE fisso: " + AU_CTE.tideFisso + " EUR/mese  |  Bonus NC: " + C.pfAdj + " EUR/mese",
+    "Costo energia: " + r.eCosto.toFixed(2) + "  |  Regolati: " + r.varReg.toFixed(2) + "  |  ME totale: " + r.materiaEnergia.toFixed(2),
+    "",
+    "--- TRASPORTO (Q1 2026 — verificato da bollette reali) ---",
+    "Fissa: " + AU_RETE.traspFisso.toFixed(6) + " EUR/mese = " + r.tFissa.toFixed(2),
+    "Potenza: " + AU_RETE.traspPot.toFixed(6) + " x " + r.kw + " kW = " + r.tPot.toFixed(2),
+    "Energia: " + AU_RETE.traspVar.toFixed(6) + " x " + r.totalKwh + " kWh = " + r.tVar.toFixed(2),
+    "TOTALE TR: " + r.trasporto.toFixed(2),
+    "",
+    "--- ONERI DI SISTEMA (Q1 2026 — verificato da bollette reali) ---",
+    "ASOS+ARIM fissa: " + r.oFissa.toFixed(2),
+    "ASOS+ARIM pot: (" + AU_RETE.asosPot.toFixed(6) + "+" + AU_RETE.arimPot.toFixed(6) + ") x " + r.kw + " = " + r.oPot.toFixed(2),
+    "ASOS+ARIM var: (" + AU_RETE.asosVar.toFixed(6) + "+" + AU_RETE.arimVar.toFixed(6) + ") x " + r.totalKwh + " = " + r.oVar.toFixed(2),
+    "TOTALE ON: " + r.oneri.toFixed(2),
+    "",
+    "Accisa 0,0125 x " + r.totalKwh + " = " + r.imposte.toFixed(2) + "  |  IVA " + r.ivaPerc + "% su " + r.impon.toFixed(2) + " = " + r.iva.toFixed(2),
+    "TOTALE: " + r.totale.toFixed(2),
+    "",
+    "Overhead vs PUN: " + r.overheadKwh.toFixed(6) + " EUR/kWh  |  Segnalazioni per CCV: " + r.segnalazioniPerZero
+  ].join("\n");
+
+  document.getElementById("res-det").innerHTML=`
+    <div class="rblock-head"><span class="rblock-head-title">Dettaglio tecnico</span></div>
+    <button class="acc-trigger" style="border-top:none" onclick="toggleAcc('acc-mat-au',this)"><span class="chev">&#9660;</span> Espandi dettaglio tecnico</button>
+    <div class="acc-panel" id="acc-mat-au"><pre>${detAU}</pre></div>`;
+
+  /* Nascondo broker lock per AU */
+  const blw = document.getElementById('broker-lock-wrap');
+  if(blw) blw.style.display='none';
+  /* Nascondo pulsanti bolletta per AU (template non ancora disponibile) */
+  const bw = document.querySelector('.boll-btn-wrap');
+  if(bw) bw.style.display='none';
 }
 
 /* ============================================================  CONFRONTO TARIFFE  */
@@ -1619,7 +2040,20 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeBolletta();});
   el.addEventListener("change",()=>{if(lastResult)calcola();});
   if(el.tagName==="INPUT")el.addEventListener("input",()=>{if(lastResult)calcola();});
 });
-document.getElementById("mese").addEventListener("change",()=>{updatePunBadge();if(lastResult)calcola();});
+// AU-specific inputs
+["kw-max","au-iva","au-offerta"].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener("change",()=>{if(lastResult)calcola();});
+  if(el.tagName==="INPUT")el.addEventListener("input",()=>{if(lastResult)calcola();});
+});
+["au-pun-f0","au-pun-f1","au-pun-f2","au-pun-f3"].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener("input",()=>{if(lastResult)calcola();});
+});
+document.querySelectorAll("input[name='au-fascia']").forEach(el=>{
+  el.addEventListener("change",()=>{if(lastResult)calcola();});
+});
+document.getElementById("mese").addEventListener("change",()=>{updatePunBadge(); updateAuPunBadge(); if(lastResult)calcola();});
 document.getElementById("bimestre").addEventListener("change",()=>{updatePunBadge();if(lastResult)calcola();});
 // init badges on load
 updatePunBadge();
