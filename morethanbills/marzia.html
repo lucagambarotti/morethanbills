@@ -205,18 +205,24 @@ function removeMessage(id) {
 window.addEventListener('load', () => {
   const p = new URLSearchParams(window.location.search);
   if (p.has('f1') || p.has('mese')) {
+    const profilo = p.get('profilo') || 'residente';
     datiSimulatore = {
       f1: parseInt(p.get('f1')) || 0,
       f2: parseInt(p.get('f2')) || 0,
       f3: parseInt(p.get('f3')) || 0,
       kw: parseFloat(p.get('kw')) || 3,
       mese: p.get('mese') || '',
-      profilo: p.get('profilo') || 'residente',
-      tariffa: 'variabile',
+      profilo: profilo,
+      tariffa: p.get('tariffa') || 'variabile',
       totale: p.get('totale') || '',
       quarta: p.get('quarta') || '',
       pun: p.get('pun') || ''
     };
+    // Parametri specifici Altri Usi
+    if (profilo === 'altriUsi') {
+      datiSimulatore.offerta = p.get('offerta') || 'variabile';
+      datiSimulatore.iva = parseInt(p.get('iva')) || 22;
+    }
   }
   document.getElementById('chat-input').focus();
 });
