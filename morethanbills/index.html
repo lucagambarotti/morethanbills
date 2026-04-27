@@ -704,12 +704,19 @@ const AU_RETE = {
 };
 // CTE Luce Amica IG — corrispettivi AU (tutti i valori per kWh NETTI, perdite incluse)
 const AU_CTE = {
+  // Corrispettivo Energia (CE) — voce fissa da CTE, comprensiva delle perdite 10% BT
+  // Applicata a TUTTI i kWh netti indipendentemente da PUN
+  ceMono: 0.0759,                               // monorario F0
+  ceF1: 0.0803, ceF2: 0.0759, ceF3: 0.0627,    // multiorario
+  // Quota variabile: Qv = PUNm × P0 - alpha (€/kWh NET)
   P0: 1.23, alpha: 0.0397,
-  sbil: 0.021670,     // €/kWh NET (= 0,019700/kWh LORDI, verificato da bollette)
-  tideVar: 0.011550,  // TIDE variabile Q2 2026 €/kWh NET
-  tideFisso: 0.007,   // €/mese
-  ccvAnno: 138.00,    // €/anno = 11,50 €/mese
+  // Componenti regolate (€/kWh NET, perdite incluse)
+  sbil: 0.021670,     // sbilanciamento
+  tideVar: 0.011550,  // TIDE variabile Q2 2026
+  tideFisso: 0.007,   // €/mese fisso
+  ccvAnno: 138.00,    // CCV €/anno = 11,50 €/mese
   accisa: 0.0125,     // €/kWh — nessuna franchigia per AU
+  // Offerta fissa (CE già incluso nei prezzi fissi)
   fissoMono: 0.1991, fissoF1: 0.2211, fissoF2: 0.2068, fissoF3: 0.1716
 };
 
@@ -839,29 +846,37 @@ function calculateAU(mese, t, f1, f2, f3, kwMax, offerta, fascia, ivaRate, punF0
   const pF0 = punF0ov || punBase;
   const pF1 = punF1ov || pF0, pF2 = punF2ov || pF0, pF3 = punF3ov || pF0;
 
-  // Costo energia — applicato ai kWh NETTI (perdite gia incluse nei corrispettivi CTE)
+  // Costo energia — CE (fisso) + Qv (variabile), entrambi su kWh NETTI (perdite incluse)
   let eCosto=0, punEff=pF0, qvLabel='';
   if(offerta==='variabile') {
     if(fascia==='mono') {
       const Qv = pF0*AU_CTE.P0 - AU_CTE.alpha;
       if(Qv<0) throw new Error("PUN "+( pF0*1000).toFixed(1)+" EUR/MWh troppo basso: Qv = "+Qv.toFixed(5)+". Min ~32 EUR/MWh.");
-      eCosto = Qv*tot; qvLabel = Qv.toFixed(5)+" EUR/kWh (F0)";
+      eCosto = (AU_CTE.ceMono + Qv)*tot;
+      qvLabel = "CE "+AU_CTE.ceMono.toFixed(4)+" + Qv "+Qv.toFixed(5)+" = "+(AU_CTE.ceMono+Qv).toFixed(5)+" EUR/kWh (F0)";
     } else {
       const Q1=pF1*AU_CTE.P0-AU_CTE.alpha, Q2=pF2*AU_CTE.P0-AU_CTE.alpha, Q3=pF3*AU_CTE.P0-AU_CTE.alpha;
       if(Q1<0||Q2<0||Q3<0) throw new Error("PUN troppo basso per una o piu fasce: Qv negativo");
-      eCosto = Q1*f1+Q2*f2+Q3*f3;
+      eCosto = (AU_CTE.ceF1+Q1)*f1 + (AU_CTE.ceF2+Q2)*f2 + (AU_CTE.ceF3+Q3)*f3;
       punEff = tot>0?(pF1*f1+pF2*f2+pF3*f3)/tot:pF0;
-      qvLabel = "F1:"+Q1.toFixed(5)+" F2:"+Q2.toFixed(5)+" F3:"+Q3.toFixed(5)+" EUR/kWh";
+      qvLabel = "F1:"+(AU_CTE.ceF1+Q1).toFixed(5)+" F2:"+(AU_CTE.ceF2+Q2).toFixed(5)+" F3:"+(AU_CTE.ceF3+Q3).toFixed(5)+" EUR/kWh (CE+Qv)";
     }
   } else {
-    if(fascia==='mono') { eCosto=AU_CTE.fissoMono*tot; qvLabel=AU_CTE.fissoMono.toFixed(5)+" EUR/kWh (fisso mono)"; }
-    else { eCosto=AU_CTE.fissoF1*f1+AU_CTE.fissoF2*f2+AU_CTE.fissoF3*f3; qvLabel="F1:"+AU_CTE.fissoF1+" F2:"+AU_CTE.fissoF2+" F3:"+AU_CTE.fissoF3+" EUR/kWh (fisso)"; }
+    if(fascia==='mono') { eCosto=AU_CTE.fissoMono*tot; qvLabel=AU_CTE.fissoMono.toFixed(5)+" EUR/kWh (fisso, CE incluso)"; }
+    else { eCosto=AU_CTE.fissoF1*f1+AU_CTE.fissoF2*f2+AU_CTE.fissoF3*f3; qvLabel="F1:"+AU_CTE.fissoF1+" F2:"+AU_CTE.fissoF2+" F3:"+AU_CTE.fissoF3+" EUR/kWh (fisso, CE incluso)"; }
     punEff = pF0;
   }
 
   // Componenti regolate per kWh NETTI (sbil + TIDE var + MC)
   const varReg = (AU_CTE.sbil + AU_CTE.tideVar + mc)*tot;
   const varRegKwh = AU_CTE.sbil + AU_CTE.tideVar + mc;
+
+  // Separazione CE e Qv per il dettaglio
+  let ceCosto=0;
+  if(offerta==='variabile'){
+    if(fascia==='mono') ceCosto=r2(AU_CTE.ceMono*tot);
+    else ceCosto=r2(AU_CTE.ceF1*f1+AU_CTE.ceF2*f2+AU_CTE.ceF3*f3);
+  } // per fissa CE è incluso nel prezzo fisso, non separabile
 
   // Materia energia
   const ME = r2(ccvMese + AU_CTE.tideFisso + C.pfAdj + eCosto + varReg);
@@ -917,7 +932,7 @@ function calculateAU(mese, t, f1, f2, f3, kwMax, offerta, fascia, ivaRate, punF0
     segnalazioniPerZero:sX, s1:sc(1), s2:sc(2), sN:sc(sX),
     pun:t.pun, punEff:r2(punEff*1000), mc,
     overheadKwh, qvLabel,
-    eCosto:r2(eCosto), varReg:r2(varReg), varRegKwh:r6(varRegKwh),
+    eCosto:r2(eCosto), ceCosto, varReg:r2(varReg), varRegKwh:r6(varRegKwh),
     tFissa, tPot, tVar, oFissa, oPot, oVar,
     impon,
     // NON usato da bolletta DOM, ma per compatibilita renderAll
@@ -1393,7 +1408,8 @@ function renderAllAU(r) {
     <div class="trow"><span class="t-name">Spesa materia energia</span><span class="t-val">${fe(r.materiaEnergia)}</span></div>
     <div class="trow sub"><span class="t-name">di cui CCV (Corrispettivi Commercializzazione)</span><span class="t-val">&euro; ${r.corrispettivi.toFixed(2).replace(".",",")}</span></div>
     <div class="trow bonus"><span class="t-name">&#8627; Bonus Nuovo Cliente / Porta un Amico (prime 3 bollette)</span><span class="t-val">&minus;&euro; 10,00</span></div>
-    <div class="trow sub"><span class="t-name">di cui energia (${r.offerta==='variabile'?'Qv':'prezzo fisso'} &times; ${r.totalKwh} kWh)</span><span class="t-val">&euro; ${r.eCosto.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui CE (Corrisp. Energia${r.offerta==='variabile'?'':' incluso nel fisso'}) &times; ${r.totalKwh} kWh</span><span class="t-val">&euro; ${r.ceCosto.toFixed(2).replace(".",",")}</span></div>
+    <div class="trow sub"><span class="t-name">di cui Qv (${r.offerta==='variabile'?'PUNm\xd71,23\u22120,0397':'prezzo fisso'}) &times; ${r.totalKwh} kWh</span><span class="t-val">&euro; ${r2(r.eCosto-r.ceCosto).toFixed(2).replace(".",",")}</span></div>
     <div class="trow sub"><span class="t-name">di cui sbil. + TIDE var. + mercato cap. &times; ${r.totalKwh} kWh</span><span class="t-val">&euro; ${r.varReg.toFixed(2).replace(".",",")}</span></div>
     <div class="trow"><span class="t-name">Trasporto, distribuzione e misura</span><span class="t-val">${fe(r.trasporto)}</span></div>
     <div class="trow sub"><span class="t-name">di cui quota fissa</span><span class="t-val">&euro; ${r.tFissa.toFixed(2).replace(".",",")}</span></div>
