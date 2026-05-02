@@ -129,7 +129,7 @@ COME USARE IL SIMULATORE:
 
 VALORI PUN RECENTI (euro/MWh):
 - Ottobre 2025: 111,04 | Novembre 2025: 117,09 | Dicembre 2025: 115,49
-- Gennaio 2026: 132,96 | Febbraio 2026: 114,41 | Marzo 2026: 143,40 | Aprile 2026: 124,76
+- Gennaio 2026: 132,96 | Febbraio 2026: 114,41 | Marzo 2026: 143,40 | Aprile 2026: 119,47
 
 REGOLE IMPORTANTI:
 - Non fare mai riferimento a nomi di fornitori energetici o nomi commerciali di offerte
